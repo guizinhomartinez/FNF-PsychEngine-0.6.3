@@ -19,7 +19,7 @@ class ClickState extends MusicBeatState
     var numbersTween:FlxTween;
 	public var curNumber:Int = 0;
     var sound:FlxSound;
-    public static var backToMain:Bool;
+    public static var backToMain:Bool = false;
 
     var bf:FlxSprite;
 

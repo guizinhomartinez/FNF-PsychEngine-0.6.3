@@ -325,6 +325,7 @@ class PlayState extends MusicBeatState
 
 	var ratingTween:FlxTween;
 	var comboTween:FlxTween;
+	var numScoreTween:FlxTween;
 
 	var songNameBarTweenOut:FlxTween;
 	var songNameDisplayTweenOut:FlxTween;
@@ -3400,6 +3401,7 @@ class PlayState extends MusicBeatState
 
 			if (ratingTween != null) ratingTween.active = false;
 			if (comboTween != null) comboTween.active = false;
+			if (numScoreTween != null) numScoreTween.active = false;
 
 			for (tween in modchartTweens) {
 				tween.active = false;
@@ -3457,6 +3459,7 @@ class PlayState extends MusicBeatState
 
 			if (ratingTween != null) ratingTween.active = true;
 			if (comboTween != null) comboTween.active = true;
+			if (numScoreTween != null) numScoreTween.active = true;
 
 			for (tween in modchartTweens) {
 				tween.active = true;
@@ -5488,7 +5491,7 @@ class PlayState extends MusicBeatState
 					ratingGroup.add(numScore);
 			}
 
-			FlxTween.tween(numScore, {alpha: 0}, 0.2, {
+			numScoreTween = FlxTween.tween(numScore, {alpha: 0}, 0.2, {
 				onComplete: function(tween:FlxTween)
 				{
 					numScore.destroy();
