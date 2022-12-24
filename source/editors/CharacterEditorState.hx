@@ -70,6 +70,7 @@ class CharacterEditorState extends MusicBeatState
 	private var camEditor:FlxCamera;
 	private var camHUD:FlxCamera;
 	private var camMenu:FlxCamera;
+	private var camTrans:FlxCamera;
 
 	var changeBGbutton:FlxButton;
 	var leHealthIcon:HealthIcon;
@@ -87,11 +88,18 @@ class CharacterEditorState extends MusicBeatState
 		camHUD.bgColor.alpha = 0;
 		camMenu = new FlxCamera();
 		camMenu.bgColor.alpha = 0;
+		camTrans = new FlxCamera();
+		camTrans.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camEditor);
 		FlxG.cameras.add(camHUD, false);
 		FlxG.cameras.add(camMenu, false);
+		FlxG.cameras.add(camTrans, false);
 		FlxG.cameras.setDefaultDrawTarget(camEditor, true);
+
+		FlxG.camera = camEditor;
+
+		CustomFadeTransition.nextCamera = camTrans;
 
 		bgLayer = new FlxTypedGroup<FlxSprite>();
 		add(bgLayer);
@@ -273,65 +281,6 @@ class CharacterEditorState extends MusicBeatState
 		}
 	}
 
-	/*var animationInputText:FlxUIInputText;
-	function addOffsetsUI() {
-		var tab_group = new FlxUI(null, UI_box);
-		tab_group.name = "Offsets";
-
-		animationInputText = new FlxUIInputText(15, 30, 100, 'idle', 8);
-
-		var addButton:FlxButton = new FlxButton(animationInputText.x + animationInputText.width + 23, animationInputText.y - 2, "Add", function()
-		{
-			var theText:String = animationInputText.text;
-			if(theText != '') {
-				var alreadyExists:Bool = false;
-				for (i in 0...animList.length) {
-					if(animList[i] == theText) {
-						alreadyExists = true;
-						break;
-					}
-				}
-
-				if(!alreadyExists) {
-					char.animOffsets.set(theText, [0, 0]);
-					animList.push(theText);
-				}
-			}
-		});
-
-		var removeButton:FlxButton = new FlxButton(animationInputText.x + animationInputText.width + 23, animationInputText.y + 20, "Remove", function()
-		{
-			var theText:String = animationInputText.text;
-			if(theText != '') {
-				for (i in 0...animList.length) {
-					if(animList[i] == theText) {
-						if(char.animOffsets.exists(theText)) {
-							char.animOffsets.remove(theText);
-						}
-
-						animList.remove(theText);
-						if(char.animation.curAnim.name == theText && animList.length > 0) {
-							char.playAnim(animList[0], true);
-						}
-						break;
-					}
-				}
-			}
-		});
-
-		var saveButton:FlxButton = new FlxButton(animationInputText.x, animationInputText.y + 35, "Save Offsets", function()
-		{
-			saveOffsets();
-		});
-
-		tab_group.add(new FlxText(10, animationInputText.y - 18, 0, 'Add/Remove Animation:'));
-		tab_group.add(addButton);
-		tab_group.add(removeButton);
-		tab_group.add(saveButton);
-		tab_group.add(animationInputText);
-		UI_box.addGroup(tab_group);
-	}*/
-
 	var TemplateCharacter:String = '{
 			"animations": [
 				{
@@ -408,7 +357,8 @@ class CharacterEditorState extends MusicBeatState
 				0
 			],
 			"sing_duration": 6.1,
-			"scale": 1
+			"noteskin": "",
+			"scale": 1,
 		}';
 
 	var charDropDown:FlxUIDropDownMenuCustom;
@@ -469,6 +419,7 @@ class CharacterEditorState extends MusicBeatState
 				character.noAntialiasing = parsedJson.no_antialiasing;
 				character.originalFlipX = parsedJson.flip_x;
 				character.healthIcon = parsedJson.healthicon;
+				character.noteSkin = parsedJson.noteskin;
 				character.healthColorArray = parsedJson.healthbar_colors;
 				character.setPosition(character.positionArray[0] + OFFSET_X + 100, character.positionArray[1]);
 			}
@@ -503,6 +454,7 @@ class CharacterEditorState extends MusicBeatState
 	var positionCameraYStepper:FlxUINumericStepper;
 
 	var flipXCheckBox:FlxUICheckBox;
+	var flipYCheckBox:FlxUICheckBox;
 	var noAntialiasingCheckBox:FlxUICheckBox;
 
 	var healthColorStepperR:FlxUINumericStepper;
@@ -551,6 +503,16 @@ class CharacterEditorState extends MusicBeatState
 			ghostChar.flipX = char.flipX;
 		};
 
+		flipYCheckBox = new FlxUICheckBox(flipXCheckBox.x, flipXCheckBox.y + 400, null, null, "Flip Y", 90);
+		flipYCheckBox.checked = char.flipY;
+		if(char.isPlayer) flipYCheckBox.checked = !flipYCheckBox.checked;
+		flipYCheckBox.callback = function() {
+			char.originalFlipY = !char.originalFlipY;
+			char.flipY = char.originalFlipY;
+
+			ghostChar.flipY = char.flipY;
+		};
+
 		noAntialiasingCheckBox = new FlxUICheckBox(flipXCheckBox.x, flipXCheckBox.y + 40, null, null, "No Antialiasing", 80);
 		noAntialiasingCheckBox.checked = char.noAntialiasing;
 		noAntialiasingCheckBox.callback = function() {
@@ -590,6 +552,7 @@ class CharacterEditorState extends MusicBeatState
 		tab_group.add(singDurationStepper);
 		tab_group.add(scaleStepper);
 		tab_group.add(flipXCheckBox);
+		tab_group.add(flipYCheckBox);
 		tab_group.add(noAntialiasingCheckBox);
 		tab_group.add(positionXStepper);
 		tab_group.add(positionYStepper);
@@ -840,12 +803,6 @@ class CharacterEditorState extends MusicBeatState
 			char.frames = Paths.getSparrowAtlas(char.imageFile);
 		}
 
-
-
-
-
-
-
 		if(char.animationsArray != null && char.animationsArray.length > 0) {
 			for (anim in char.animationsArray) {
 				var animAnim:String = '' + anim.anim;
@@ -985,6 +942,7 @@ class CharacterEditorState extends MusicBeatState
 			singDurationStepper.value = char.singDuration;
 			scaleStepper.value = char.jsonScale;
 			flipXCheckBox.checked = char.originalFlipX;
+			flipYCheckBox.checked = char.originalFlipY;
 			noAntialiasingCheckBox.checked = char.noAntialiasing;
 			resetHealthBarColor();
 			leHealthIcon.changeIcon(healthIconInputText.text);
@@ -992,6 +950,7 @@ class CharacterEditorState extends MusicBeatState
 			positionYStepper.value = char.positionArray[1];
 			positionCameraXStepper.value = char.cameraPosition[0];
 			positionCameraYStepper.value = char.cameraPosition[1];
+
 			reloadAnimationDropDown();
 			updatePresence();
 		}
@@ -1087,7 +1046,7 @@ class CharacterEditorState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		MusicBeatState.camBeat = FlxG.camera;
+		MusicBeatState.camBeat = camEditor;
 		if(char.animationsArray[curAnim] != null) {
 			textAnim.text = char.animationsArray[curAnim].anim;
 
@@ -1126,16 +1085,16 @@ class CharacterEditorState extends MusicBeatState
 			}
 
 			if (FlxG.keys.justPressed.R) {
-				FlxG.camera.zoom = 1;
+				camEditor.zoom = 1;
 			}
 
-			if (FlxG.keys.pressed.E && FlxG.camera.zoom < 3) {
-				FlxG.camera.zoom += elapsed * FlxG.camera.zoom;
-				if(FlxG.camera.zoom > 3) FlxG.camera.zoom = 3;
+			if (FlxG.keys.pressed.E && camEditor.zoom < 3) {
+				camEditor.zoom += elapsed * camEditor.zoom;
+				if(camEditor.zoom > 3) camEditor.zoom = 3;
 			}
-			if (FlxG.keys.pressed.Q && FlxG.camera.zoom > 0.1) {
-				FlxG.camera.zoom -= elapsed * FlxG.camera.zoom;
-				if(FlxG.camera.zoom < 0.1) FlxG.camera.zoom = 0.1;
+			if (FlxG.keys.pressed.Q && camEditor.zoom > 0.1) {
+				camEditor.zoom -= elapsed * camEditor.zoom;
+				if(camEditor.zoom < 0.1) camEditor.zoom = 0.1;
 			}
 
 			if (FlxG.keys.pressed.I || FlxG.keys.pressed.J || FlxG.keys.pressed.K || FlxG.keys.pressed.L)
@@ -1278,6 +1237,7 @@ class CharacterEditorState extends MusicBeatState
 			"scale": char.jsonScale,
 			"sing_duration": char.singDuration,
 			"healthicon": char.healthIcon,
+			"noteskin": char.noteSkin,
 
 			"position":	char.positionArray,
 			"camera_position": char.cameraPosition,

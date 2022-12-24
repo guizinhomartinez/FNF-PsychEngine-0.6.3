@@ -32,6 +32,22 @@ class LoadingState extends MusicBeatState
 	var callbacks:MultiCallback;
 	var targetShit:Float = 0;
 
+	var images:Array<String> = [
+		'banger art',
+		'blank',
+		'cool',
+		'coolswag',
+		'funkay - Copy',
+		'funkay',
+		'Layer 7',
+		'LOAD',
+		'maded in magma',
+		'schtix gang',
+		'them',
+		'this is actually a loading screen art',
+		'triple trouble'
+	];
+
 	function new(target:FlxState, stopMusic:Bool, directory:String)
 	{
 		super();
@@ -46,7 +62,7 @@ class LoadingState extends MusicBeatState
 	{
 		var bg:FlxSprite = new FlxSprite(0, 0).makeGraphic(FlxG.width, FlxG.height, 0xffcaff4d);
 		add(bg);
-		funkay = new FlxSprite(0, 0).loadGraphic(Paths.getPath('images/funkay.png', IMAGE));
+		funkay = new FlxSprite(0, 0).loadGraphic(Paths.image('loading/' + images[FlxG.random.int(1, 13)]));
 		funkay.setGraphicSize(0, FlxG.height);
 		funkay.updateHitbox();
 		funkay.antialiasing = ClientPrefs.globalAntialiasing;

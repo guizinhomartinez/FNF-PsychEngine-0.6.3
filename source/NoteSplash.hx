@@ -13,9 +13,12 @@ class NoteSplash extends FlxSprite
 	public function new(x:Float = 0, y:Float = 0, ?note:Int = 0) {
 		super(x, y);
 
+		CoolUtil.precacheImage('noteSplashes', 'shared');
+		CoolUtil.precacheImage('noteSplashOld', 'shared');
+		CoolUtil.precacheImage('bloodSplash', 'shared');
+
 		var skin:String = 'noteSplashes';
 		if(PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) skin = PlayState.SONG.splashSkin;
-
 		loadAnims(skin);
 		
 		colorSwap = new ColorSwap();
@@ -27,10 +30,24 @@ class NoteSplash extends FlxSprite
 
 	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null, hueColor:Float = 0, satColor:Float = 0, brtColor:Float = 0) {
 		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
-		alpha = 0.6;
+		switch(texture) {
+			case 'bloodSplash':
+				alpha = 1;
+			default:
+				alpha =	0.6;
+		}
 
 		if(texture == null) {
-			texture = 'noteSplashes';
+			switch (texture) {
+				case 'bloodSplash': 
+					texture = 'bloodSplash';
+				case 'noteSplashes':
+					texture = 'noteSplashes';
+				case 'noteSplashOld':
+					texture = 'noteSplashOld';
+				default:
+					texture = 'noteSplashes';
+			}
 			if(PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) texture = PlayState.SONG.splashSkin;
 		}
 
@@ -40,7 +57,16 @@ class NoteSplash extends FlxSprite
 		colorSwap.hue = hueColor;
 		colorSwap.saturation = satColor;
 		colorSwap.brightness = brtColor;
-		offset.set(10, 10);
+		switch (texture) {
+			case 'bloodSplash':
+				offset.set(-30, -90);
+			case 'noteSplashOld':
+				offset.set(-30, -30);
+			case 'noteSplashes':
+				offset.set(10, 10);
+			default:
+				offset.set(10, 10);
+		}
 
 		var animNum:Int = FlxG.random.int(1, 2);
 		animation.play('note' + note + '-' + animNum, true);
@@ -49,11 +75,14 @@ class NoteSplash extends FlxSprite
 
 	function loadAnims(skin:String) {
 		frames = Paths.getSparrowAtlas(skin);
-		for (i in 1...3) {
-			animation.addByPrefix("note1-" + i, "note splash blue " + i, 24, false);
-			animation.addByPrefix("note2-" + i, "note splash green " + i, 24, false);
-			animation.addByPrefix("note0-" + i, "note splash purple " + i, 24, false);
-			animation.addByPrefix("note3-" + i, "note splash red " + i, 24, false);
+		switch (skin) {
+			default:
+				for (i in 1...3) {
+					animation.addByPrefix("note1-" + i, "note splash blue " + i, 24, false);
+					animation.addByPrefix("note2-" + i, "note splash green " + i, 24, false);
+					animation.addByPrefix("note0-" + i, "note splash purple " + i, 24, false);
+					animation.addByPrefix("note3-" + i, "note splash red " + i, 24, false);
+				}
 		}
 	}
 

@@ -143,7 +143,11 @@ class Paths
 
 	static public function getLibraryPath(file:String, library = "preload")
 	{
-		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
+		return
+		if (library == "preload" || library == "default")
+			getPreloadPath(file);
+		else
+			getLibraryPathForce(file, library);
 	}
 
 	inline static function getLibraryPathForce(file:String, library:String)
@@ -175,6 +179,11 @@ class Paths
 	inline static public function json(key:String, ?library:String)
 	{
 		return getPath('data/$key.json', TEXT, library);
+	}
+
+	inline static public function hscript(key:String, ?library:String)
+	{
+		return getPath('data/$key.hx', TEXT, library);
 	}
 
 	inline static public function shaderFragment(key:String, ?library:String)
@@ -307,7 +316,6 @@ class Paths
 		#end
 	}
 
-
 	inline static public function getPackerAtlas(key:String, ?library:String)
 	{
 		#if MODS_ALLOWED
@@ -359,7 +367,7 @@ class Paths
 			localTrackedAssets.push(path);
 			return currentTrackedAssets.get(path);
 		}
-		trace('oh no its returning null NOOOO');
+		trace('oh fuck. $path is returning null... what do we do now?');
 		return null;
 	}
 
@@ -399,8 +407,16 @@ class Paths
 		return 'mods/' + key;
 	}
 
+	inline static public function modsNhscript(key:String, ?library:String) {
+		return modFolders('data/$key.hx');
+	}
+
 	inline static public function modsFont(key:String) {
 		return modFolders('fonts/' + key);
+	}
+
+	static public function songJson(song:String, ?library:String) {
+		return getPath('data/' + song.toLowerCase() + '.json', TEXT, library);
 	}
 
 	inline static public function modsJson(key:String) {
@@ -419,6 +435,19 @@ class Paths
 		return modFolders('images/' + key + '.png');
 	}
 
+	inline static public function modsDoxxieImages(key:String) {
+		return modFolders('Doxxie/doxxie/images' + key + '.png');
+	}
+
+	inline static public function txtNew(key:String, ?library:String)
+	{
+		return getPath('$key.txt', TEXT, library);
+	}
+
+	inline static public function modsDoxxieMusic(key:String) {
+		return modFolders('Doxxie/doxxie/music' + key + '.ogg');
+	}
+
 	inline static public function modsXml(key:String) {
 		return modFolders('images/' + key + '.xml');
 	}
@@ -426,20 +455,6 @@ class Paths
 	inline static public function modsTxt(key:String) {
 		return modFolders('images/' + key + '.txt');
 	}
-
-	/* Goes unused for now
-
-	inline static public function modsShaderFragment(key:String, ?library:String)
-	{
-		return modFolders('shaders/'+key+'.frag');
-	}
-	inline static public function modsShaderVertex(key:String, ?library:String)
-	{
-		return modFolders('shaders/'+key+'.vert');
-	}
-	inline static public function modsAchievements(key:String) {
-		return modFolders('achievements/' + key + '.json');
-	}*/
 
 	static public function modFolders(key:String) {
 		if(currentModDirectory != null && currentModDirectory.length > 0) {

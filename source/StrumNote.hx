@@ -21,12 +21,15 @@ class StrumNote extends FlxSprite
 	private function set_texture(value:String):String {
 		if(texture != value) {
 			texture = value;
-			reloadNote();
+			if (PlayState.SONG.changeArrows) 
+				reloadNote(texture);
+			else
+				reloadNote();
 		}
 		return value;
 	}
 
-	public function new(x:Float, y:Float, leData:Int, player:Int) {
+	public function new(x:Float, y:Float, leData:Int, player:Int, noteskin:String = "") {
 		colorSwap = new ColorSwap();
 		shader = colorSwap.shader;
 		noteData = leData;
@@ -36,22 +39,23 @@ class StrumNote extends FlxSprite
 
 		var skin:String = 'NOTE_assets';
 		if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1) skin = PlayState.SONG.arrowSkin;
+		if (PlayState.SONG.changeArrows && noteskin != "") skin = noteskin;
 		texture = skin; //Load texture and anims
-
 		scrollFactor.set();
 	}
 
-	public function reloadNote()
+	public function reloadNote(tex:String = 'NOTE_assets')
 	{
 		var lastAnim:String = null;
+		var texe:String = tex;
 		if(animation.curAnim != null) lastAnim = animation.curAnim.name;
 
 		if(PlayState.isPixelStage)
 		{
-			loadGraphic(Paths.image('pixelUI/' + texture));
+			loadGraphic(Paths.image('pixelUI/' + texe));
 			width = width / 4;
 			height = height / 5;
-			loadGraphic(Paths.image('pixelUI/' + texture), true, Math.floor(width), Math.floor(height));
+			loadGraphic(Paths.image('pixelUI/' + texe), true, Math.floor(width), Math.floor(height));
 
 			antialiasing = false;
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
@@ -82,7 +86,10 @@ class StrumNote extends FlxSprite
 		}
 		else
 		{
-			frames = Paths.getSparrowAtlas(texture);
+			if (PlayState.SONG.changeArrows)
+				frames = Paths.getSparrowAtlas('note stuff/skin/$texe');
+			else
+				frames = Paths.getSparrowAtlas(texture);
 			animation.addByPrefix('green', 'arrowUP');
 			animation.addByPrefix('blue', 'arrowDOWN');
 			animation.addByPrefix('purple', 'arrowLEFT');
@@ -135,10 +142,8 @@ class StrumNote extends FlxSprite
 				resetAnim = 0;
 			}
 		}
-		//if(animation.curAnim != null){ //my bad i was upset
 		if(animation.curAnim.name == 'confirm' && !PlayState.isPixelStage) {
 			centerOrigin();
-		//}
 		}
 
 		super.update(elapsed);

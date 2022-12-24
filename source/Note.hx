@@ -35,6 +35,8 @@ class Note extends FlxSprite
 
 	public var spawned:Bool = false;
 
+	public var shouldbehidden:Bool = false;
+
 	public var tail:Array<Note> = []; // for sustains
 	public var parent:Note;
 	public var blockHit:Bool = false; // only works for player
@@ -57,6 +59,8 @@ class Note extends FlxSprite
 	public var lateHitMult:Float = 1;
 	public var lowPriority:Bool = false;
 
+	public var noteSkin:String = "";
+
 	public static var swagWidth:Float = 160 * 0.7;
 	
 	private var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
@@ -65,6 +69,7 @@ class Note extends FlxSprite
 	// Lua shit
 	public var noteSplashDisabled:Bool = false;
 	public var noteSplashTexture:String = null;
+	public var noteSplashAlpha:Float = 0.6;
 	public var noteSplashHue:Float = 0;
 	public var noteSplashSat:Float = 0;
 	public var noteSplashBrt:Float = 0;
@@ -91,6 +96,9 @@ class Note extends FlxSprite
 	public var noAnimation:Bool = false;
 	public var noMissAnimation:Bool = false;
 	public var hitCausesMiss:Bool = false;
+	public var boyfriend2play:Bool = false;
+	public var boyfriend2alts:Bool = false;
+	public var bothBFsPlay:Bool = false;
 	public var distance:Float = 2000; //plan on doing scroll directions soon -bb
 
 	public var hitsoundDisabled:Bool = false;
@@ -113,7 +121,10 @@ class Note extends FlxSprite
 
 	private function set_texture(value:String):String {
 		if(texture != value) {
-			reloadNote('', value);
+			if (PlayState.SONG.changeArrows)
+				reloadNote('note stuff/skin/', value);
+			else
+				reloadNote('', value);
 		}
 		texture = value;
 		return value;
@@ -121,6 +132,7 @@ class Note extends FlxSprite
 
 	private function set_noteType(value:String):String {
 		noteSplashTexture = PlayState.SONG.splashSkin;
+		noteSplashAlpha = PlayState.SONG.splashAlpha;
 		if (noteData > -1 && noteData < ClientPrefs.arrowHSV.length)
 		{
 			colorSwap.hue = ClientPrefs.arrowHSV[noteData][0] / 360;
@@ -152,6 +164,17 @@ class Note extends FlxSprite
 					noMissAnimation = true;
 				case 'GF Sing':
 					gfNote = true;
+				case 'Boyfriend 2 Play':
+					boyfriend2play = true;
+				case 'Boyfriend 2 Alts':
+					boyfriend2alts = true;
+				case 'Both BFs Play':
+					bothBFsPlay = true;
+				case 'Invisible Note':
+					reloadNote('INVIS');
+				case 'I.N No Animation':
+					noAnimation = true;
+					reloadNote('INVIS');
 			}
 			noteType = value;
 		}
@@ -161,7 +184,7 @@ class Note extends FlxSprite
 		return value;
 	}
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false)
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?noteskin:String = "")
 	{
 		super();
 
@@ -180,8 +203,14 @@ class Note extends FlxSprite
 
 		this.noteData = noteData;
 
+		if (noteskin == '') 
+			this.noteSkin = '';
+		else 
+			this.noteSkin = noteskin;
+
 		if(noteData > -1) {
-			texture = '';
+			if (PlayState.SONG.changeArrows) texture = noteskin;
+			else texture = '';
 			colorSwap = new ColorSwap();
 			shader = colorSwap.shader;
 
@@ -229,10 +258,9 @@ class Note extends FlxSprite
 
 				if(PlayState.isPixelStage) {
 					prevNote.scale.y *= 1.19;
-					prevNote.scale.y *= (6 / height); //Auto adjust note size
+					prevNote.scale.y *= (6 / height);
 				}
 				prevNote.updateHitbox();
-				// prevNote.setGraphicSize();
 			}
 
 			if(PlayState.isPixelStage) {
@@ -248,7 +276,7 @@ class Note extends FlxSprite
 	var lastNoteOffsetXForPixelAutoAdjusting:Float = 0;
 	var lastNoteScaleToo:Float = 1;
 	public var originalHeightForCalcs:Float = 6;
-	function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = '') {
+	public function reloadNote(?prefix:String = '', ?texture:String = '', ?suffix:String = '') {
 		if(prefix == null) prefix = '';
 		if(texture == null) texture = '';
 		if(suffix == null) suffix = '';
@@ -292,13 +320,6 @@ class Note extends FlxSprite
 				offsetX += lastNoteOffsetXForPixelAutoAdjusting;
 				lastNoteOffsetXForPixelAutoAdjusting = (width - 7) * (PlayState.daPixelZoom / 2);
 				offsetX -= lastNoteOffsetXForPixelAutoAdjusting;
-
-				/*if(animName != null && !animName.endsWith('end'))
-				{
-					lastScaleY /= lastNoteScaleToo;
-					lastNoteScaleToo = (6 / height);
-					lastScaleY *= lastNoteScaleToo;
-				}*/
 			}
 		} else {
 			frames = Paths.getSparrowAtlas(blahblah);

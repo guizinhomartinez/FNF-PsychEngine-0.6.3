@@ -17,15 +17,15 @@ import flixel.FlxBasic;
 
 class MusicBeatState extends FlxUIState
 {
-	private var curSection:Int = 0;
-	private var stepsToDo:Int = 0;
+	public var curSection:Int = 0;
+	public var stepsToDo:Int = 0;
 
-	private var curStep:Int = 0;
-	private var curBeat:Int = 0;
+	public var curStep:Int = 0;
+	public var curBeat:Int = 0;
 
-	private var curDecStep:Float = 0;
-	private var curDecBeat:Float = 0;
-	private var controls(get, never):Controls;
+	public var curDecStep:Float = 0;
+	public var curDecBeat:Float = 0;
+	public var controls(get, never):Controls;
 
 	public static var camBeat:FlxCamera;
 
@@ -38,7 +38,7 @@ class MusicBeatState extends FlxUIState
 		super.create();
 
 		if(!skip) {
-			openSubState(new CustomFadeTransition(0.7, true));
+			openSubState(new CustomFadeTransitionNEW(0.7, true));
 		}
 		FlxTransitionableState.skipNextTransOut = false;
 	}
@@ -123,14 +123,14 @@ class MusicBeatState extends FlxUIState
 		var curState:Dynamic = FlxG.state;
 		var leState:MusicBeatState = curState;
 		if(!FlxTransitionableState.skipNextTransIn) {
-			leState.openSubState(new CustomFadeTransition(0.6, false));
+			leState.openSubState(new CustomFadeTransitionNEW(0.6, false));
 			if(nextState == FlxG.state) {
-				CustomFadeTransition.finishCallback = function() {
+				CustomFadeTransitionNEW.finishCallback = function() {
 					FlxG.resetState();
 				};
 				//trace('resetted');
 			} else {
-				CustomFadeTransition.finishCallback = function() {
+				CustomFadeTransitionNEW.finishCallback = function() {
 					FlxG.switchState(nextState);
 				};
 				//trace('changed state');

@@ -372,7 +372,14 @@ class FreeplayState extends MusicBeatState
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = curDifficulty;
 
-			trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
+			if (WeekData.getWeekFileName() == 'china')
+			{
+				trace('CURRENT COUNTRY: ' + WeekData.getWeekFileName());
+			}
+			else
+			{
+				trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
+			}
 			if(colorTween != null) {
 				colorTween.cancel();
 			}
@@ -461,9 +468,12 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...iconArray.length)
 		{
 			iconArray[i].alpha = 0.6;
+			//iconArray[i].animation.curAnim.curFrame = 0;
 		}
 
 		iconArray[curSelected].alpha = 1;
+
+		//iconArray[curSelected].animation.curAnim.curFrame = 1;
 
 		for (item in grpSongs.members)
 		{
@@ -471,14 +481,16 @@ class FreeplayState extends MusicBeatState
 			bullShit++;
 
 			item.alpha = 0.6;
+			item.xAdd = 0;
 			// item.setGraphicSize(Std.int(item.width * 0.8));
 
 			if (item.targetY == 0)
 			{
 				item.alpha = 1;
+				item.xAdd = 70;
 				// item.setGraphicSize(Std.int(item.width));
 			}
-		}
+		}	
 		
 		Paths.currentModDirectory = songs[curSelected].folder;
 		PlayState.storyWeek = songs[curSelected].week;

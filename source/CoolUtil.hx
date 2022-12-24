@@ -17,6 +17,7 @@ using StringTools;
 
 class CoolUtil
 {
+	public static var instance2:CoolUtil;
 	public static var defaultDifficulties:Array<String> = [
 		'Easy',
 		'Normal',
@@ -25,6 +26,10 @@ class CoolUtil
 	public static var defaultDifficulty:String = 'Normal'; //The chart that has no suffix and starting difficulty on Freeplay/Story Mode
 
 	public static var difficulties:Array<String> = [];
+
+	public function create() {
+		instance2 = this;
+	}
 
 	inline public static function quantize(f:Float, snap:Float){
 		// changed so this actually works lol
@@ -112,6 +117,18 @@ class CoolUtil
 		return maxKey;
 	}
 
+	public static function coolTextFile2(path:String):Array<String>
+	{
+		var daList:Array<String> = File.getContent(path).trim().split('\n');
+
+		for (i in 0...daList.length)
+		{
+			daList[i] = daList[i].trim();
+		}
+
+		return daList;
+	}
+
 	public static function numberArray(max:Int, ?min = 0):Array<Int>
 	{
 		var dumbArray:Array<Int> = [];
@@ -127,8 +144,19 @@ class CoolUtil
 		Paths.sound(sound, library);
 	}
 
+	public static function precacheImage(image:String, ?library:String = null):Void
+	{
+		precacheImageFile(Paths.image(image, library));
+	}
+
 	public static function precacheMusic(sound:String, ?library:String = null):Void {
 		Paths.music(sound, library);
+	}
+
+	private static function precacheImageFile(file:Dynamic):Void
+	{
+		if (Assets.exists(file, IMAGE))
+			LimeAssets.getImage(file, true);
 	}
 
 	public static function browserLoad(site:String) {
