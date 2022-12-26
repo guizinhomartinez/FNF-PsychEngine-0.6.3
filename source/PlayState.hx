@@ -60,10 +60,9 @@ import StageData;
 import FunkinLua;
 import DialogueBoxPsych;
 import Conductor.Rating;
+import FreeplayState.SongMetadata;
 import Script;
 import Lyrics;
-import Paths;
-// import import; // funny
 
 #if !flash 
 import flixel.addons.display.FlxRuntimeShader;
@@ -81,7 +80,8 @@ import vlc.MP4Handler;
 
 using StringTools;
 
-typedef StageCamera = {
+typedef StageCamera =
+{
 	@:optional var bfZoom:Float;
 	@:optional var dadZoom:Float;
 	@:optional var gfZoom:Float;
@@ -1743,7 +1743,7 @@ class PlayState extends MusicBeatState
 		Conductor.safeZoneOffset = (ClientPrefs.safeFrames / 60) * 1000;
 		callOnLuas('onCreatePost', []);
 
-		script.executeFunc("onCreatePost");
+		if (script != null) script.executeFunc("onCreatePost");
 
 		super.create();
 
@@ -1764,7 +1764,10 @@ class PlayState extends MusicBeatState
 		}
 		Paths.clearUnusedMemory();
 
-		script.executeFunc("onCreate");
+		if (script != null)
+		{
+			script.executeFunc("onCreate");
+		}
 
 		CustomFadeTransition.nextCamera = camOther;
 		CustomFadeTransitionNEW.nextCamera = camOther;
@@ -2556,7 +2559,10 @@ class PlayState extends MusicBeatState
 			generateStaticArrows(0);
 			generateStaticArrows(1);
 
-			script.executeFunc("onStartCountdown");
+			if (script != null)
+			{
+				script.executeFunc("onStartCountdown");
+			}
 
 			for (i in 0...playerStrums.length) {
 				setOnLuas('defaultPlayerStrumX' + i, playerStrums.members[i].x);
@@ -2835,7 +2841,7 @@ class PlayState extends MusicBeatState
 		callOnLuas('onUpdateScore', [miss]);
 		callOnLuas('onUpdateScore', [noKicking]);
 
-		script.executeFunc("onUpdateScore");
+		if (script != null) script.executeFunc("onUpdateScore");
 	}
 
 	public function setSongTime(time:Float)
@@ -2904,7 +2910,10 @@ class PlayState extends MusicBeatState
 		FlxTween.tween(timeBarBG, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 
-		script.executeFunc("onSongStart");
+		if (script != null)
+		{
+			script.executeFunc("onSongStart");
+		}
 
 		switch(curStage)
 		{
@@ -4148,7 +4157,10 @@ class PlayState extends MusicBeatState
 		setOnLuas('botPlay', cpuControlled);
 		callOnLuas('onUpdatePost', [elapsed]);
 
-		script.executeFunc("onUpdate");
+		if (script != null)
+		{
+			script.executeFunc("onUpdate");
+		}
 	}
 
 	function openPauseMenu()
@@ -4167,7 +4179,9 @@ class PlayState extends MusicBeatState
 		DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
 		#end
 
-		script.executeFunc("onPauseMenu");
+		if (script != null) {
+			script.executeFunc("onPauseMenu");
+		}
 	}
 
 	function openChartEditor()
@@ -4815,7 +4829,10 @@ class PlayState extends MusicBeatState
 			camFollow.y += gf.cameraPosition[1] + girlfriendCameraOffset[1] + gfCameraOffY;
 			tweenCamIn();
 			callOnLuas('onMoveCamera', ['gf']);
-			script.setVariable("onMoveCamera", gf);
+			if (script != null)
+			{
+				script.setVariable("onMoveCamera", gf);
+			}
 			return;
 		}
 
@@ -4826,7 +4843,10 @@ class PlayState extends MusicBeatState
 			camFollow.set(boyfriend2.getMidpoint().x - 100, boyfriend2.getMidpoint().y - 100);
 			camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0] + bf2CameraOffX;
 			camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1] + bf2CameraOffY;
-			script.setVariable("onMoveCamera", boyfriend2);
+			if (script != null)
+			{
+				script.setVariable("onMoveCamera", gf);
+			}
 			return;
 		}
 
@@ -4834,13 +4854,19 @@ class PlayState extends MusicBeatState
 		{
 			moveCamera(true);
 			callOnLuas('onMoveCamera', ['dad']);
-			script.setVariable("onMoveCamera", dad);
+			if (script != null)
+			{
+				script.setVariable("onMoveCamera", dad);
+			}
 		}
 		else
 		{
 			moveCamera(false);
 			callOnLuas('onMoveCamera', ['boyfriend']);
-			script.setVariable("onMoveCamera", boyfriend);
+			if (script != null)
+			{
+				script.setVariable("onMoveCamera", boyfriend);
+			}
 		}
 	}
 
@@ -6369,9 +6395,12 @@ class PlayState extends MusicBeatState
 		if(FunkinLua.hscript != null) FunkinLua.hscript = null;
 		#end
 
-		script.executeFunc("destroy");
-		script.destroy();
-		if(script != null) script = null;
+		if (script != null)
+		{
+			script.executeFunc("destroy");
+
+			script.destroy();
+		}
 
 		if(!ClientPrefs.controllerMode)
 		{
@@ -6435,8 +6464,11 @@ class PlayState extends MusicBeatState
 			iconShow.kill();
 		}
 
-		script.setVariable("curStep", curStep);
-		script.executeFunc("onStepHit");
+		if (script != null)
+		{
+			script.setVariable("curStep", curStep);
+			script.executeFunc("onStepHit");
+		}
 
 		lastStepHit = curStep;
 		setOnLuas('curStep', curStep);
@@ -6605,7 +6637,10 @@ class PlayState extends MusicBeatState
 		setOnLuas('curBeat', curBeat); //DAWGG?????
 		callOnLuas('onBeatHit', []);
 
-		script.executeFunc("onBeatHit");
+		if (script != null)
+		{
+			script.executeFunc("onBeatHit");
+		}
 	}
 
 	override function sectionHit()
@@ -6878,7 +6913,6 @@ class PlayState extends MusicBeatState
 					}
 				}
 			}
-			return null;
 		}
 
 		if (hxdata != "")
@@ -6970,7 +7004,6 @@ class PlayState extends MusicBeatState
 
 			script.runScript(hxdata);
 		}
-		return null;
 	}
 
 	function getSingPos(pos:Array<Float>, noteData:Int):Array<Float>

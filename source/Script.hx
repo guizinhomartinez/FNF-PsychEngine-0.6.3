@@ -32,20 +32,17 @@ class Script extends FlxBasic
 
 	public function setVariable(name:String, val:Dynamic)
 	{
-		if (hscript != null)
-			hscript.variables.set(name, val);
+		hscript.variables.set(name, val);
 	}
 
 	public function moveCameraVariable(name:String, args:Array<Dynamic>)
 	{
-		if (hscript != null)
-			hscript.variables.set(name, args);
+		hscript.variables.set(name, args);
 	}
 
 	public function getVariable(name:String):Dynamic
 	{
-		if (hscript != null)
-			return hscript.variables.get(name);
+		return hscript.variables.get(name);
 	}
 
 	public function executeFunc(funcName:String, ?args:Array<Any>):Dynamic
