@@ -7,8 +7,10 @@ import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import haxe.Json;
-import PlayState;
+//import PlayState;
+#if desktop
 import sys.io.File;
+#end
 
 using StringTools;
 
@@ -17,7 +19,7 @@ using StringTools;
  * basically, you'll input the point of steps (1 by default, the starting step), then for each "/" used within the lyrics
  * you can input the step at which that division will be highlighted. If the number of steps exceeds the amount of divisions,
  * then the lyrics will end at the first succeeding step.
- */
+*/
 typedef LyricMeasure = {
     var steps:Array<Float>; 
     var curString:String;
