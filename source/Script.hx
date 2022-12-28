@@ -23,6 +23,8 @@ class Script extends FlxBasic
 			var ast = parser.parseString(script);
 
 			hscript.execute(ast);
+
+			trace('hscript file loaded succesfully: ' + ast);
 		}
 		catch (e)
 		{

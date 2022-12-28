@@ -262,7 +262,7 @@ class MainMenuState extends MusicBeatState
 				selectedSomethin = true;
 				MusicBeatState.switchState(new MasterEditorMenu());
 			}
-			if (FlxG.keys.justPressed.O)
+			if (FlxG.keys.pressed.O)
 			{
 				selectedSomethin = true;
 				trace('went to clickstate');
@@ -270,7 +270,8 @@ class MainMenuState extends MusicBeatState
 			}
 			if (ClickState.backToMain == true)
 			{
-				FlxG.sound.playMusic(Paths.music('freakyMenu'), 1);
+				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+				FlxG.sound.music.fadeIn(4, 0, 0.7);
 			}
 			#end
 		}

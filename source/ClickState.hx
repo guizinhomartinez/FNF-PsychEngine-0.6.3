@@ -25,7 +25,7 @@ class ClickState extends MusicBeatState
 
 	override public function create()
     {
-        ClientPrefs.framerate = 240;
+        // ClientPrefs.framerate = 240;
 
         Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
@@ -90,7 +90,6 @@ class ClickState extends MusicBeatState
         {
             MusicBeatState.switchState(new MainMenuState());
             backToMain = true;
-            FlxG.sound.music.fadeOut(4, 0);
         }
 
         if (curNumber == 99)

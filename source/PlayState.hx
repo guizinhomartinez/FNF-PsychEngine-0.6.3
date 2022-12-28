@@ -4845,7 +4845,7 @@ class PlayState extends MusicBeatState
 			camFollow.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1] + bf2CameraOffY;
 			if (script != null)
 			{
-				script.setVariable("onMoveCamera", gf);
+				script.setVariable("onMoveCamera", boyfriend2);
 			}
 			return;
 		}
