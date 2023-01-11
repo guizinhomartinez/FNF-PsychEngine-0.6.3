@@ -7,8 +7,7 @@ import flixel.util.FlxColor;
 import flixel.text.FlxText;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import haxe.Json;
-//import PlayState;
-#if desktop
+#if sys
 import sys.io.File;
 #end
 

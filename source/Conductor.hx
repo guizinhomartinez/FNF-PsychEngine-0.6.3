@@ -83,6 +83,8 @@ class Conductor
 		return lastChange;
 	}
 
+	public static var ROWS_PER_BEAT = 48; // from Stepmania
+
 	public static function beatToSeconds(beat:Float): Float{
 		var step = beat * 4;
 		var lastChange = getBPMFromStep(step);
@@ -106,6 +108,9 @@ class Conductor
 	public static function getBeatRounded(time:Float):Int{
 		return Math.floor(getStepRounded(time)/4);
 	}
+
+	public inline static function secsToRow(sex:Float):Int
+		return Math.round(getBeat(sex) * ROWS_PER_BEAT);
 
 	public static function mapBPMChanges(song:SwagSong)
 	{

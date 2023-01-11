@@ -109,7 +109,7 @@ class Paths
 		}
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
-		openfl.Assets.cache.clear("songs");
+		#if !html5 openfl.Assets.cache.clear("songs"); #end
 	}
 
 	static public var currentModDirectory:String = '';
@@ -229,16 +229,24 @@ class Paths
 
 	inline static public function voices(song:String):Any
 	{
+		#if html5
+		return 'songs:assets/songs/${formatToSongPath(song)}/Voices.$SOUND_EXT';
+		#else
 		var songKey:String = '${formatToSongPath(song)}/Voices';
 		var voices = returnSound('songs', songKey);
 		return voices;
+		#end
 	}
 
 	inline static public function inst(song:String):Any
 	{
+		#if html5
+		return 'songs:assets/songs/${formatToSongPath(song)}/Inst.$SOUND_EXT';
+		#else
 		var songKey:String = '${formatToSongPath(song)}/Inst';
 		var inst = returnSound('songs', songKey);
 		return inst;
+		#end
 	}
 
 	inline static public function image(key:String, ?library:String):FlxGraphic
@@ -417,6 +425,14 @@ class Paths
 
 	static public function songJson(song:String, ?library:String) {
 		return getPath('data/' + song.toLowerCase() + '.json', TEXT, library);
+	}
+
+	static public function songTxt(song:String, ?library:String) {
+		return getPath('data/' + song.toLowerCase() + '.txt', TEXT, library);
+	}
+
+	static public function modTxt(key:String) {
+		return modFolders('data/$key.txt');
 	}
 
 	inline static public function modsJson(key:String) {

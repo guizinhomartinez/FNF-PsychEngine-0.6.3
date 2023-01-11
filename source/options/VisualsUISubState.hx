@@ -61,7 +61,7 @@ class VisualsUISubState extends BaseOptionsMenu
 			'gameHuds',
 			'string',
 			'New HUD',
-			['New HUD', 'Default']);
+			['New HUD', 'Vs Impostor HUD', 'Default']);
 		addOption(option);
 
 		var option:Option = new Option('Flashing Lights',

@@ -19,6 +19,8 @@ typedef EventNote = {
 
 class Note extends FlxSprite
 {
+	public var row:Int = 0;
+
 	public var extraData:Map<String,Dynamic> = [];
 
 	public var strumTime:Float = 0;
@@ -99,9 +101,16 @@ class Note extends FlxSprite
 	public var boyfriend2play:Bool = false;
 	public var boyfriend2alts:Bool = false;
 	public var bothBFsPlay:Bool = false;
+	public var ghostNotes:Bool = false;
+	public var ghostNotes2:Bool = false;
+	public var ghostNotes3:Bool = false;
 	public var distance:Float = 2000; //plan on doing scroll directions soon -bb
 
 	public var hitsoundDisabled:Bool = false;
+
+	public var parentNote:Note;
+	public var childrenNotes:Array<Note> = [];
+	public var endHoldOffset:Float = Math.NEGATIVE_INFINITY;
 
 	private function set_multSpeed(value:Float):Float {
 		resizeByRatio(value / multSpeed);
@@ -173,6 +182,16 @@ class Note extends FlxSprite
 				case 'Invisible Note':
 					reloadNote('INVIS');
 				case 'I.N No Animation':
+					noAnimation = true;
+					reloadNote('INVIS');
+				case "Ghost Notes":
+					ghostNotes = true;
+				case "Ghost Notes Invisible":
+					ghostNotes2 = true;
+					noAnimation = true;
+					reloadNote('INVIS');
+				case "Ghost Notes Invis b.P.t.L.O.A":
+					ghostNotes3 = true;
 					noAnimation = true;
 					reloadNote('INVIS');
 			}
@@ -271,6 +290,15 @@ class Note extends FlxSprite
 			earlyHitMult = 1;
 		}
 		x += offsetX;
+
+		// determine parent note
+		if (isSustainNote && prevNote != null) {
+			parentNote = prevNote;
+			while (parentNote.parentNote != null)
+				parentNote = parentNote.parentNote;
+			parentNote.childrenNotes.push(this);
+		} else if (!isSustainNote)
+			parentNote = null;
 	}
 
 	var lastNoteOffsetXForPixelAutoAdjusting:Float = 0;
