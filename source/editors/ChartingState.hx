@@ -102,10 +102,16 @@ class ChartingState extends MusicBeatState
 		['Change Character', "Value 1: Character to change (Dad, BF, GF)\nValue 2: New character's name"],
 		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
 		['Set Property', "Value 1: Variable name\nValue 2: New value"],
-		['Opponent Anim', "Value 1: Character to change (dad, gf)\nValue 2: Camera position (1 = normal, 2 = gf)"],
+		/*['Opponent Anim', "Value 1: Character to change (dad, gf)\nValue 2: Camera position (1 = normal, 2 = gf)"],
 		['Super Fade', "Value 1: Super Idol opacity"],
-		['Super Flash', "Value 1: Flash duration"],
-		['Zoom Amount', "Value 1: Changes the \"defaultCamZoom\""]
+		['Super Flash', "Value 1: Flash duration"],*/
+		['Zoom Amount', "Value 1: Changes the \"defaultCamZoom\""],
+		['Set Camera Zoom', "Sets the Camera's Zoom.\nThis is based on standard stage zoom rules\n\nValue 1: New Zoom Value\n\nValue 2: If left blank,\nthe camera will zoom in/out smoothly.\nOtherwise it will instantly zoom in/out."],
+		//vs impostor events
+		['DefeatDark', "black thingy"],
+		['flash', "weirdly programmed flash event (dont change) \n 0 and 1 are normal flashes but 2 and 3 are \n for fades in identity crisis specifically"],
+		['Defeat Fade', 'defeat bodies apear'],
+		['Defeat Retro', 'defeat bodies apear']
 	];
 
 	var _file:FileReference;
@@ -159,7 +165,6 @@ class ChartingState extends MusicBeatState
 	var curSelectedNote:Array<Dynamic> = null;
 
 	var tempBpm:Float = 0;
-	var playbackSpeed:Float = 1;
 
 	var vocals:FlxSound = null;
 
@@ -1348,12 +1353,6 @@ class ChartingState extends MusicBeatState
 		voicesVolume.name = 'voices_volume';
 		blockPressWhileTypingOnStepper.push(voicesVolume);
 
-		#if !html5
-		sliderRate = new FlxUISlider(this, 'playbackSpeed', 120, 120, 0.5, 3, 150, null, 5, FlxColor.WHITE, FlxColor.BLACK);
-		sliderRate.nameLabel.text = 'Playback Rate';
-		tab_group_chart.add(sliderRate);
-		#end
-
 		tab_group_chart.add(new FlxText(metronomeStepper.x, metronomeStepper.y - 15, 0, 'BPM:'));
 		tab_group_chart.add(new FlxText(metronomeOffsetStepper.x, metronomeOffsetStepper.y - 15, 0, 'Offset (ms):'));
 		tab_group_chart.add(new FlxText(instVolume.x, instVolume.y - 15, 0, 'Inst Volume'));
@@ -1524,14 +1523,6 @@ class ChartingState extends MusicBeatState
 					curSelectedNote[0] = value;
 					updateGrid();
 				}
-			}
-		}
-		else if (id == FlxUISlider.CHANGE_EVENT && (sender is FlxUISlider))
-		{
-			switch (sender)
-			{
-				case 'playbackSpeed':
-					playbackSpeed = Std.int(sliderRate.value);
 			}
 		}
 
@@ -1727,14 +1718,15 @@ class ChartingState extends MusicBeatState
 			}
 
 
-			if (FlxG.keys.justPressed.BACKSPACE) {
+			/*if (FlxG.keys.justPressed.BACKSPACE) {
 				//if(onMasterEditor) {
 					MusicBeatState.switchState(new editors.MasterEditorMenu());
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 				//}
+				autosaveSong();
 				FlxG.mouse.visible = false;
 				return;
-			}
+			}*/
 
 			if(FlxG.keys.justPressed.Z && FlxG.keys.pressed.CONTROL) {
 				undo();
@@ -2005,28 +1997,6 @@ class ChartingState extends MusicBeatState
 			strumLineNotes.members[i].alpha = FlxG.sound.music.playing ? 1 : 0.35;
 		}
 
-		var holdingShift = FlxG.keys.pressed.SHIFT;
-		var holdingLB = FlxG.keys.pressed.LBRACKET;
-		var holdingRB = FlxG.keys.pressed.RBRACKET;
-		var pressedLB = FlxG.keys.justPressed.LBRACKET;
-		var pressedRB = FlxG.keys.justPressed.RBRACKET;
-
-		if (!holdingShift && pressedLB || holdingShift && holdingLB)
-			playbackSpeed -= 0.01;
-		if (!holdingShift && pressedRB || holdingShift && holdingRB)
-			playbackSpeed += 0.01;
-		if (FlxG.keys.pressed.ALT && (pressedLB || pressedRB || holdingLB || holdingRB))
-			playbackSpeed = 1;
-		//
-
-		if (playbackSpeed <= 0.5)
-			playbackSpeed = 0.5;
-		if (playbackSpeed >= 3)
-			playbackSpeed = 3;
-
-		FlxG.sound.music.pitch = playbackSpeed;
-		vocals.pitch = playbackSpeed;
-
 		bpmTxt.text =
 		Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2)) + " / " + Std.string(FlxMath.roundDecimal(FlxG.sound.music.length / 1000, 2)) +
 		"\nSection: " + curSec +
@@ -2056,7 +2026,7 @@ class ChartingState extends MusicBeatState
 					var noteDataToCheck:Int = note.noteData;
 					if(noteDataToCheck > -1 && note.mustPress != _song.notes[curSec].mustHitSection) noteDataToCheck += 4;
 						strumLineNotes.members[noteDataToCheck].playAnim('confirm', true);
-						strumLineNotes.members[noteDataToCheck].resetAnim = ((note.sustainLength / 1000) + 0.15) / playbackSpeed;
+						strumLineNotes.members[noteDataToCheck].resetAnim = (note.sustainLength / 1000) + 0.15;
 					if(!playedSound[data]) {
 						if((playSoundBf.checked && note.mustPress) || (playSoundDad.checked && !note.mustPress)){
 							var soundToPlay = 'hitsound';

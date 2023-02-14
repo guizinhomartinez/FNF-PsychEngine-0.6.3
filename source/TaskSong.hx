@@ -72,7 +72,7 @@ class TaskSong extends FlxSpriteGroup
 
         icon = new HealthIcon(PlayState.instance.dad.healthIcon, false);
         icon.y = text.y - 60;
-        icon.x = text.fieldWidth + 5;
+        icon.x = text.width + 5;
         icon.animation.curAnim.curFrame = 0;
         icon.scale.x = 0.25; icon.scale.y = 0.25;
 
@@ -156,7 +156,7 @@ class TaskSongModsFolder extends FlxSpriteGroup
 
         icon = new HealthIcon(PlayState.instance.dad.healthIcon, false);
         icon.y = text.y - 60;
-        icon.x = text.fieldWidth + 5;
+        icon.x = text.width + 5;
         icon.animation.curAnim.curFrame = 0;
         icon.scale.x = 0.25; icon.scale.y = 0.25;
 
@@ -204,7 +204,7 @@ class TaskSongNotFound extends FlxSpriteGroup
             addToPath = "" + _numberThing;
         }
 
-        var pulledText:String = "Song: " + PlayState.SONG.song + "\n" + "Composer: N/A";
+        var pulledText:String = PlayState.SONG.song + "\n" + "Composer(s): N/A";
 
         var splitText:Array<String> = [];
         
@@ -217,9 +217,11 @@ class TaskSongNotFound extends FlxSpriteGroup
         trace(splitText.length);
 
         var text = new FlxText(0, 0, 0, "", fontSize);
+        text.antialiasing = ClientPrefs.globalAntialiasing;
         text.setFormat(Paths.font("vcr.ttf"), fontSize, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
         var text2 = new FlxText(0, 30, 0, "", fontSize);
+        text2.antialiasing = ClientPrefs.globalAntialiasing;
         text2.setFormat(Paths.font("vcr.ttf"), fontSize, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 
 

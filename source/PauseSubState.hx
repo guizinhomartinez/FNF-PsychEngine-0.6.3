@@ -383,13 +383,16 @@ class PauseSubState extends MusicBeatSubstate
 	{
 		if(skipTimeText == null || skipTimeTracker == null) return;
 
-		skipTimeText.x = skipTimeTracker.x + skipTimeTracker.width + 60;
-		skipTimeText.y = skipTimeTracker.y;
+		skipTimeText.x = skipTimeTracker.x + skipTimeTracker.width + 200;
+		skipTimeText.y = skipTimeTracker.y + 20;
 		skipTimeText.visible = (skipTimeTracker.alpha >= 1);
 	}
 
 	function updateSkipTimeText()
 	{
-		skipTimeText.text = '\n' + FlxStringUtil.formatTime(Math.max(0, Math.floor(curTime / 1000)), false) + ' / ' + FlxStringUtil.formatTime(Math.max(0, Math.floor(FlxG.sound.music.length / 1000)), false);
+		skipTimeText.text = '\n' + 
+		FlxStringUtil.formatTime(Math.max(0, Math.floor(curTime / 1000)), false) +
+		' / ' +
+		FlxStringUtil.formatTime(Math.max(0, Math.floor(FlxG.sound.music.length / 1000)), false);
 	}
 }

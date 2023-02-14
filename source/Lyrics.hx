@@ -47,14 +47,14 @@ class Lyrics extends FlxTypedGroup<FlxText> {
         var lyricsFile:String = '';
         var foldersToCheck:Array<String>;
         #if MODS_ALLOWED
-		foldersToCheck = [Paths.songJson(PlayState.SONG.song.toLowerCase() + '/lyricss')];
-		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0) foldersToCheck = [Paths.modsJson(PlayState.SONG.song.toLowerCase() + '/lyricss')];
+		foldersToCheck = [Paths.songJson(PlayState.SONG.song.toLowerCase().replace(" ", "-") + '/lyricss')];
+		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0) foldersToCheck = [Paths.modsJson(PlayState.SONG.song.toLowerCase().replace(" ", "-") + '/lyricss')];
 
-		for (mod in Paths.getGlobalMods()) foldersToCheck = [Paths.mods(mod + 'data/' + PlayState.SONG.song.toLowerCase() + '/lyricss')];
+		for (mod in Paths.getGlobalMods()) foldersToCheck = [Paths.mods(mod + 'data/' + PlayState.SONG.song.toLowerCase().replace(" ", "-") + '/lyricss')];
 
         for (folder in foldersToCheck) lyricsFile = File.getContent(folder).trim();
         #else
-        lyricsFile = File.getContent(Paths.songJson(PlayState.SONG.song.toLowerCase() + '/lyricss')).trim();
+        lyricsFile = File.getContent(Paths.songJson(PlayState.SONG.song.toLowerCase().replace(" ", "-") + '/lyricss')).trim();
         #end
 
         while (!lyricsFile.endsWith("}"))
