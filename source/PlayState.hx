@@ -415,8 +415,6 @@ class PlayState extends MusicBeatState
 	private var keysArray:Array<Dynamic>;
 	private var controlArray:Array<String>;
 
-	private var noteComboArray:Array<Dynamic>;
-
 	var precacheList:Map<String, String> = new Map<String, String>();
 
 	var stageCameras:Map<String, StageCamera> = [
@@ -512,11 +510,9 @@ class PlayState extends MusicBeatState
 
 	public var doItBro:Bool = false;
 
-	public var lastMustHit:Bool = false;
 	public var notesHit:Int = 0;
-	public var seperatedHits:String = "";
-	public var noteComboX:Float = 0;
-	public var noteComboY:Float = 0;
+
+	var lastMustHit:Dynamic;
 
 	override public function create()
 	{
@@ -526,6 +522,8 @@ class PlayState extends MusicBeatState
 		{
 			trace('fucking your mom');
 		}*/
+
+		lastMustHit = SONG.notes[curSection].mustHitSection;
 
 		followChars = false;
 
@@ -580,8 +578,6 @@ class PlayState extends MusicBeatState
 			ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_up')),
 			ClientPrefs.copyKey(ClientPrefs.keyBinds.get('note_right'))
 		];
-
-		noteComboArray = [1, 2, 3];
 
 		controlArray = [
 			'NOTE_LEFT',
@@ -5811,151 +5807,69 @@ class PlayState extends MusicBeatState
 
 	public var healthMultiplier:Float = 1;
 
-	var noteCombo:FlxSprite;
-	var tagSprite:FlxSprite;
 
-	function playCertainAnimation(anim:String, force:Bool = false)
+	private function popUpNoteCombo(elapsed:Float = 0):Void
 	{
-		noteCombo.animation.play(anim, force);
+		/**
+		 * original script made by stilic
+		 * i just ported it to Haxe
+		 * :)
+		 */
+		var noteCombo:FlxSprite;
 
-		var ox:Float = 0; var oy:Float = 0;
-
-		if (anim == "disappear") ox = -150;
-
-		noteCombo.offset.x = ox;
-		noteCombo.offset.y = oy;
-	}
-
-	private function popUpNoteCombo()
-	{
-		lastMustHit = SONG.notes[curSection].mustHitSection;
-
-		noteComboX = boyfriend.x / 10 + boyfriend.x / 4;
-		noteComboY = boyfriend.y / 10 + boyfriend.y / 6 + 300;
-
+		noteCombo = new FlxSprite();
+		noteCombo.frames = Paths.getSparrowAtlas("noteCombo");
 		if (isPixelStage || camGame.zoom > 1 || defaultCamZoom > 1)
 		{
-			noteComboX -= 180;
-			noteComboY /= 1.3;
+			noteCombo.x = BF_X / 10 + 200 - 180;
+			noteCombo.y = BF_Y / 10 + 100 / 1.3;
 		}
-
-		noteCombo = new FlxSprite(noteComboX, noteComboY).loadGraphic("noteCombo");
+		else
+		{
+			noteCombo.x = BF_X / 10 + 200;
+			noteCombo.y = BF_Y / 10 + 100;
+		}
 		noteCombo.scrollFactor.set(0.5, 0.5);
 		noteCombo.animation.addByPrefix("appear", "appear", 24, false);
-		noteCombo.animation.addByPrefix("disappear", "disappear", 24, false);
+		noteCombo.animation.addByPrefix("disappear", "disappear", 40, false);
 		noteCombo.visible = false;
 		noteCombo.active = false;
 		noteCombo.antialiasing = ClientPrefs.globalAntialiasing;
 		noteCombo.cameras = [camHUD];
-		add(noteCombo);
-
-		for (i in 1...3)
-		{
-			var tag:String = "noteComboN" + i;
-
-			tagSprite = new FlxSprite(noteComboX - 170 + i * 160, noteComboY + 110 - i * 50).loadGraphic("noteComboNumbers");
-			tagSprite.scrollFactor.set(0.5, 0.5);
-			tagSprite.scale.set(0.99, 0.99);
-			for (m in 0...9)
-			{
-				tagSprite.animation.addByPrefix(m + "a", m + "_appear", 24, false);
-				tagSprite.animation.addByPrefix(m + 'd', m + "_disappear", 24, false);
-			}
-			tagSprite.visible = false;
-			tagSprite.active = false;
-			tagSprite.antialiasing = ClientPrefs.globalAntialiasing;
-			tagSprite.cameras = [camHUD];
-			insert(members.indexOf(notes), tagSprite);
-		}
+		insert(members.indexOf(notes), noteCombo);
 
 		if (lastMustHit != SONG.notes[curSection].mustHitSection)
 		{
 			lastMustHit = SONG.notes[curSection].mustHitSection;
-			
-			if (!lastMustHit && notesHit > 5 && (curBeat % 4 == 0 || curBeat % 6 == 0)) {
+			if (!lastMustHit && notesHit > 5 && (curBeat % 2 == 0 || curBeat % 4 == 0))
+			{
 				noteCombo.visible = true;
 				noteCombo.active = true;
-
-				seperatedHits = "";
-				var wtf:String = Std.string(notesHit);
-
-				for (i in 1...noteComboArray.length)
-				{
-					var placeHolder:String = "";
-					var num:String = placeHolder.substring(Std.parseInt(wtf), i);
-
-					if (num != "")
-					{
-						seperatedHits += num;
-					}
-					else
-					{
-						seperatedHits = " " + seperatedHits;
-					}
-				}
-
-				for (i in 1...noteComboArray.length)
-				{
-					var placeHolder:String = "";
-					var num:String = placeHolder.substring(Std.parseInt(seperatedHits), i);
-
-					if (num != "" && num != " ") {
-						tagSprite.visible = true;
-						tagSprite.active = true;
-						tagSprite.animation.play(num + "a");
-					}
-					else
-					{
-						tagSprite.visible = false;
-						tagSprite.active = false;
-					}
-				}
-
+				noteCombo.animation.play("appear", true);
+				FlxG.sound.play(Paths.sound("NoteComboExecute"));
+	
+				trace("diamond chestplate");
+	
 				notesHit = 0;
 			}
 		}
 
-		if (noteCombo.animation.finished)
+		noteCombo.animation.finishCallback = function(name:String)
 		{
-			var placeHolder:String = "";
-			for (i in 1...noteComboArray.length) var num:String = placeHolder.substring(Std.parseInt(seperatedHits), i);
-
-			var ateUrFrame:String = noteCombo.animation.curAnim.name;
-
-			if (ateUrFrame == "appear")
+			if (name == "appear")
 			{
-				var placeHolder:String = "";
-				for (i in 1...noteComboArray.length) var tag:String = "noteComboN" + i;
-				for (i in 1...noteComboArray.length) var num:String = placeHolder.substring(Std.parseInt(seperatedHits), i);
-
-				playCertainAnimation("dissapear");
-				
-				for (i in 1...noteComboArray.length)
-				{
-					var placeHolder:String = "";
-					var tag:String = "noteComboN" + i;
-					var num:String = placeHolder.substring(Std.parseInt(seperatedHits), i);
-
-					if (num != "" && num != " ") {
-						tagSprite.animation.play(num + "d");
-					}
-				}
+				noteCombo.animation.play("disappear");
 			}
-			else if (ateUrFrame == "disappear")
+			if (name == "disappear")
 			{
 				noteCombo.visible = false;
 				noteCombo.active = false;
-
-				for (i in 1...noteComboArray.length)
-				{
-					tagSprite.visible = false;
-					tagSprite.active = false;
-				}
+				noteCombo.offset.x = -150;
 			}
 		}
 	}
 
-	private function popUpScore(note:Note = null, isMiss:Bool = false, elapsed:Float = 0):Void
+	private function popUpScore(note:Note = null, elapsed:Float = 0):Void
 	{
 		var noteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition + ClientPrefs.ratingOffset);
 		//trace(noteDiff, ' ' + Math.abs(note.strumTime - Conductor.songPosition));
@@ -6039,7 +5953,7 @@ class PlayState extends MusicBeatState
 			pixelShitPart1 = 'chineseUI/';
 		}
 
-		rating.loadGraphic(Paths.image(pixelShitPart1 + (!isMiss ? daRating.image : "miss") + pixelShitPart2));
+		rating.loadGraphic(Paths.image(pixelShitPart1 + daRating.image + pixelShitPart2));
 		rating.screenCenter();
 		rating.y += 200 + offsetY;
 		rating.x = coolText.x - 40 + offsetX;
@@ -6100,7 +6014,7 @@ class PlayState extends MusicBeatState
 
 		if (showCombo && combo >= 25)
 		{
-			ratingGroup.add(comboSpr);
+			// ratingGroup.add(comboSpr);
 		}
 		if (!ClientPrefs.comboStacking)
 		{
@@ -6141,10 +6055,8 @@ class PlayState extends MusicBeatState
 			numScore.velocity.x = FlxG.random.float(-5, 5);
 			numScore.visible = !ClientPrefs.hideHud;
 
-			//if (combo >= 10 || combo == 0)
 			if(showComboNum) {
-				if (!isMiss)
-					ratingGroup.add(numScore);
+				ratingGroup.add(numScore);
 			}
 
 			numScoreTween = FlxTween.tween(numScore, {alpha: 0}, 0.2, {
@@ -6577,8 +6489,6 @@ class PlayState extends MusicBeatState
 				char = gf;
 			}
 
-			if (!note.isSustainNote) totalNotes -= 1;
-
 			var notehealthdmg:Float = 0.00;
 
 			switch (dad.curCharacter)
@@ -6787,7 +6697,7 @@ class PlayState extends MusicBeatState
 					health += note.hitHealth / note.parentNote.childrenNotes.length * healthMultiplier;
 			}
 
-			//popUpNoteCombo();
+			popUpNoteCombo();
 
 			if (nostalgicSongs) 
 				health += note.hitHealth * healthGain;
