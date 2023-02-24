@@ -176,7 +176,8 @@ class Note extends FlxSprite
 				case 'Boyfriend 2 Play':
 					boyfriend2play = true;
 				case 'Boyfriend 2 Alts':
-					boyfriend2alts = true;
+					animSuffix = '-alt';
+					boyfriend2play = true;
 				case 'Both BFs Play':
 					bothBFsPlay = true;
 				case 'Invisible Note':
