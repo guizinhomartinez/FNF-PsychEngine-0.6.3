@@ -106,7 +106,8 @@ class ChartingState extends MusicBeatState
 		['Super Fade', "Value 1: Super Idol opacity"],
 		['Super Flash', "Value 1: Flash duration"],*/
 		['Zoom Amount', "Value 1: Changes the \"defaultCamZoom\""],
-		['Set Camera Zoom', "Sets the Camera's Zoom.\nThis is based on standard stage zoom rules\n\nValue 1: New Zoom Value\n\nValue 2: If left blank,\nthe camera will zoom in/out smoothly.\nOtherwise it will instantly zoom in/out."],
+		['Set Camera Zoom', "Sets the Camera's Zoom.\nThis is based on standard stage zoom rules\nValue 1: New Zoom Value\n\nValue 2: If left blank,\nthe camera will zoom in/out smoothly.\nOtherwise it will instantly zoom in/out.\nValue 3: If left blank,\nthe default ease type will be \"sineInOut\",\nOtherwise, it will use the ease type applied in value 3"],
+		['Add Cinematic Bars', "Adds Cinematic bars.\nValue 1: the speed that the bars are created\nValue 2: thickness of the bars"],
 		//vs impostor events
 		['DefeatDark', "black thingy"],
 		['flash', "weirdly programmed flash event (dont change) \n 0 and 1 are normal flashes but 2 and 3 are \n for fades in identity crisis specifically"],
@@ -165,6 +166,7 @@ class ChartingState extends MusicBeatState
 	var curSelectedNote:Array<Dynamic> = null;
 
 	var tempBpm:Float = 0;
+	var playbackSpeed:Float = 1;
 
 	var vocals:FlxSound = null;
 
@@ -173,6 +175,7 @@ class ChartingState extends MusicBeatState
 
 	var value1InputText:FlxUIInputText;
 	var value2InputText:FlxUIInputText;
+	var value3InputText:FlxUIInputText;
 	var currentSongName:String;
 
 	var zoomTxt:FlxText;
@@ -1070,7 +1073,7 @@ class ChartingState extends MusicBeatState
 		eventPushedMap = null;
 		#end
 
-		descText = new FlxText(20, 200, 0, eventStuff[0][0]);
+		descText = new FlxText(20, 240, 0, eventStuff[0][0]);
 
 		var leEvents:Array<String> = [];
 		for (i in 0...eventStuff.length) {
@@ -1094,20 +1097,25 @@ class ChartingState extends MusicBeatState
 
 		var text:FlxText = new FlxText(20, 90, 0, "Value 1:");
 		tab_group_event.add(text);
-		value1InputText = new FlxUIInputText(20, 110, 100, "");
+		value1InputText = new FlxUIInputText(20, 110, 250, "");
 		blockPressWhileTypingOn.push(value1InputText);
 
 		var text:FlxText = new FlxText(20, 130, 0, "Value 2:");
 		tab_group_event.add(text);
-		value2InputText = new FlxUIInputText(20, 150, 100, "");
+		value2InputText = new FlxUIInputText(20, 150, 250, "");
 		blockPressWhileTypingOn.push(value2InputText);
+
+		var text:FlxText = new FlxText(20, 170, 0, "Value 3:");
+		tab_group_event.add(text);
+		value3InputText = new FlxUIInputText(20, 190, 250, "");
+		blockPressWhileTypingOn.push(value3InputText);
 
 		// New event buttons
 		var removeButton:FlxButton = new FlxButton(eventDropDown.x + eventDropDown.width + 10, eventDropDown.y, '-', function()
 		{
 			if(curSelectedNote != null && curSelectedNote[2] == null) //Is event note
 			{
-				if(curSelectedNote[1].length < 2)
+				if(curSelectedNote[1].length < 3)
 				{
 					_song.events.remove(curSelectedNote);
 					curSelectedNote = null;
@@ -1119,8 +1127,10 @@ class ChartingState extends MusicBeatState
 
 				var eventsGroup:Array<Dynamic>;
 				--curEventSelected;
-				if(curEventSelected < 0) curEventSelected = 0;
-				else if(curSelectedNote != null && curEventSelected >= (eventsGroup = curSelectedNote[1]).length) curEventSelected = eventsGroup.length - 1;
+				if (curEventSelected < 0)
+					curEventSelected = 0;
+				else if (curSelectedNote != null && curEventSelected >= (eventsGroup = curSelectedNote[1]).length)
+					curEventSelected = eventsGroup.length - 1;
 
 				changeEventSelected();
 				updateGrid();
@@ -1136,10 +1146,10 @@ class ChartingState extends MusicBeatState
 
 		var addButton:FlxButton = new FlxButton(removeButton.x + removeButton.width + 10, removeButton.y, '+', function()
 		{
-			if(curSelectedNote != null && curSelectedNote[2] == null) //Is event note
+			if(curSelectedNote != null && curSelectedNote[3] == null) //Is event note
 			{
 				var eventsGroup:Array<Dynamic> = curSelectedNote[1];
-				eventsGroup.push(['', '', '']);
+				eventsGroup.push(['', '', '', '']);
 
 				changeEventSelected(1);
 				updateGrid();
@@ -1180,6 +1190,7 @@ class ChartingState extends MusicBeatState
 		tab_group_event.add(descText);
 		tab_group_event.add(value1InputText);
 		tab_group_event.add(value2InputText);
+		tab_group_event.add(value3InputText);
 		tab_group_event.add(eventDropDown);
 
 		UI_box.addGroup(tab_group_event);
@@ -1353,6 +1364,12 @@ class ChartingState extends MusicBeatState
 		voicesVolume.name = 'voices_volume';
 		blockPressWhileTypingOnStepper.push(voicesVolume);
 
+		#if !html5
+		sliderRate = new FlxUISlider(this, 'playbackSpeed', 120, 120, 0.5, 3, 150, null, 5, FlxColor.WHITE, FlxColor.BLACK);
+		sliderRate.nameLabel.text = 'Playback Rate';
+		tab_group_chart.add(sliderRate);
+		#end
+
 		tab_group_chart.add(new FlxText(metronomeStepper.x, metronomeStepper.y - 15, 0, 'BPM:'));
 		tab_group_chart.add(new FlxText(metronomeOffsetStepper.x, metronomeOffsetStepper.y - 15, 0, 'Offset (ms):'));
 		tab_group_chart.add(new FlxText(instVolume.x, instVolume.y - 15, 0, 'Inst Volume'));
@@ -1517,12 +1534,24 @@ class ChartingState extends MusicBeatState
 					curSelectedNote[1][curEventSelected][2] = value2InputText.text;
 					updateGrid();
 				}
+				else if (sender == value3InputText) {
+					curSelectedNote[1][curEventSelected][3] = value3InputText.text;
+					updateGrid();
+				}
 				else if(sender == strumTimeInputText) {
 					var value:Float = Std.parseFloat(strumTimeInputText.text);
 					if(Math.isNaN(value)) value = 0;
 					curSelectedNote[0] = value;
 					updateGrid();
 				}
+			}
+		}
+		else if (id == FlxUISlider.CHANGE_EVENT && (sender is FlxUISlider))
+		{
+			switch (sender)
+			{
+				case 'playbackSpeed':
+					playbackSpeed = Std.int(sliderRate.value);
 			}
 		}
 
@@ -1997,6 +2026,29 @@ class ChartingState extends MusicBeatState
 			strumLineNotes.members[i].alpha = FlxG.sound.music.playing ? 1 : 0.35;
 		}
 
+		// PLAYBACK SPEED CONTROLS //
+		var holdingShift = FlxG.keys.pressed.SHIFT;
+		var holdingLB = FlxG.keys.pressed.LBRACKET;
+		var holdingRB = FlxG.keys.pressed.RBRACKET;
+		var pressedLB = FlxG.keys.justPressed.LBRACKET;
+		var pressedRB = FlxG.keys.justPressed.RBRACKET;
+
+		if (!holdingShift && pressedLB || holdingShift && holdingLB)
+			playbackSpeed -= 0.01;
+		if (!holdingShift && pressedRB || holdingShift && holdingRB)
+			playbackSpeed += 0.01;
+		if (FlxG.keys.pressed.ALT && (pressedLB || pressedRB || holdingLB || holdingRB))
+			playbackSpeed = 1;
+		//
+
+		if (playbackSpeed <= 0.5)
+			playbackSpeed = 0.5;
+		if (playbackSpeed >= 3)
+			playbackSpeed = 3;
+
+		FlxG.sound.music.pitch = playbackSpeed;
+		vocals.pitch = playbackSpeed;
+
 		bpmTxt.text =
 		Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2)) + " / " + Std.string(FlxMath.roundDecimal(FlxG.sound.music.length / 1000, 2)) +
 		"\nSection: " + curSec +
@@ -2026,7 +2078,7 @@ class ChartingState extends MusicBeatState
 					var noteDataToCheck:Int = note.noteData;
 					if(noteDataToCheck > -1 && note.mustPress != _song.notes[curSec].mustHitSection) noteDataToCheck += 4;
 						strumLineNotes.members[noteDataToCheck].playAnim('confirm', true);
-						strumLineNotes.members[noteDataToCheck].resetAnim = (note.sustainLength / 1000) + 0.15;
+						strumLineNotes.members[noteDataToCheck].resetAnim = (note.sustainLength / 1000) + 0.15 / playbackSpeed;
 					if(!playedSound[data]) {
 						if((playSoundBf.checked && note.mustPress) || (playSoundDad.checked && !note.mustPress)){
 							var soundToPlay = 'hitsound';
@@ -2566,6 +2618,7 @@ class ChartingState extends MusicBeatState
 				}
 				value1InputText.text = curSelectedNote[1][curEventSelected][1];
 				value2InputText.text = curSelectedNote[1][curEventSelected][2];
+				value3InputText.text = curSelectedNote[1][curEventSelected][3];
 			}
 			strumTimeInputText.text = '' + curSelectedNote[0];
 		}
@@ -2632,7 +2685,8 @@ class ChartingState extends MusicBeatState
 				var note:Note = setupNoteData(i, false);
 				curRenderedNotes.add(note);
 
-				var text:String = 'Event: ' + note.eventName + ' (' + Math.floor(note.strumTime) + ' ms)' + '\nValue 1: ' + note.eventVal1 + '\nValue 2: ' + note.eventVal2;
+				var text:String = 'Event: ' + note.eventName + ' (' + Math.floor(note.strumTime) + ' ms)' + '\nValue 1: ' + note.eventVal1 + '\nValue 2: ' 
+					+ note.eventVal2 + '\nValue 3: ' + note.eventVal3;
 				if(note.eventLength > 1) text = note.eventLength + ' Events:\n' + note.eventName;
 
 				var daText:AttachedFlxText = new AttachedFlxText(0, 0, 400, text, 12);
@@ -2697,10 +2751,11 @@ class ChartingState extends MusicBeatState
 			note.loadGraphic(Paths.image('eventArrow'));
 			note.eventName = getEventName(i[1]);
 			note.eventLength = i[1].length;
-			if(i[1].length < 2)
+			if(i[1].length < 3)
 			{
 				note.eventVal1 = i[1][0][1];
 				note.eventVal2 = i[1][0][2];
+				note.eventVal3 = i[1][0][3];
 			}
 			note.noteData = -1;
 			daNoteInfo = -1;
@@ -2891,7 +2946,8 @@ class ChartingState extends MusicBeatState
 			var event = eventStuff[Std.parseInt(eventDropDown.selectedId)][0];
 			var text1 = value1InputText.text;
 			var text2 = value2InputText.text;
-			_song.events.push([noteStrum, [[event, text1, text2]]]);
+			var text3 = value3InputText.text;
+			_song.events.push([noteStrum, [[event, text1, text2, text3]]]);
 			curSelectedNote = _song.events[_song.events.length - 1];
 			curEventSelected = 0;
 			changeEventSelected();

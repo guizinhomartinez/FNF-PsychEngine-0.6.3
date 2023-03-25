@@ -57,11 +57,18 @@ class VisualsUISubState extends BaseOptionsMenu
 		addOption(option);
 
 		var option:Option = new Option('Game HUD:',
-			"What should the Game HUD be?",
+			"What should the Game HUD be?\nWARNING! Sacorg HUD may make some mods break!",
 			'gameHuds',
 			'string',
 			'New HUD',
-			['New HUD', 'Vs Impostor HUD', 'Default']);
+			['New HUD', 'Vs Impostor HUD', 'Sacorg HUD', 'Myth Engine HUD', 'Default']);
+		addOption(option);
+
+		var option:Option = new Option('Smooth Health',
+			"If enabled, when hitting a note, the health will smoothly be added\nWARNING! mods that remove health may break!",
+			'smoothHealth',
+			'Bool',
+			false);
 		addOption(option);
 
 		var option:Option = new Option('Flashing Lights',
