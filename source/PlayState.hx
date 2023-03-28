@@ -573,6 +573,15 @@ class PlayState extends MusicBeatState
 	var healthTweenObj:FlxTween;
 	var healthTweenObj2:FlxTween;
 
+	var jukeBoxTag:FlxSprite;
+    var jukeBox:FlxSprite;
+    var jukeBoxText:FlxText;
+    var jukeBoxSubText:FlxText;
+
+	var introTextSize:Int = 25;
+	var introSubTextSize:Int = 30;
+	var introTagWidth:Int = 15;
+
 	override public function create()
 	{
 		lastMustHit = SONG.notes[curSection].mustHitSection;
@@ -599,18 +608,31 @@ class PlayState extends MusicBeatState
 			];
 		}
 		else if (ClientPrefs.gameHuds == "Myth Engine HUD")
-			{
-				ratingRankStuff = [
-					['N/A', 0.1099], //From 0% to 19%
-					['D', 0.5999], //From 20% to 39%
-					['C', 0.7099], //From 40% to 49%
-					['B', 0.7999], //69%
-					['A', 0.8099], //From 70% to 79%
-					['A.', 0.8599], //From 80% to 89%
-					['A:', 0.9], //From 90% to 99%
-					['AA', 1] //The value on this one isn't used actually, since Perfect is always "1"
-				];
-			}
+		{
+			ratingRankStuff = [
+				['N/A', 0.1099], //From 0% to 19%
+				['D', 0.5999], //From 20% to 39%
+				['C', 0.7099], //From 40% to 49%
+				['B', 0.7999], //69%
+				['A', 0.8099], //From 70% to 79%
+				['A.', 0.8599], //From 80% to 89%
+				['A:', 0.9], //From 90% to 99%
+				['AA', 1] //The value on this one isn't used actually, since Perfect is always "1"
+			];
+
+			ratingStuff = [
+				['You Suck!', 0.2], //From 0% to 19%
+				['Shit', 0.4], //From 20% to 39%
+				['Bad', 0.5], //From 40% to 49%
+				['Bruh', 0.6], //From 50% to 59%
+				['Meh', 0.69], //From 60% to 68%
+				['Nice', 0.7], //69%
+				['Good', 0.8], //From 70% to 79%
+				['Great', 0.9], //From 80% to 89%
+				['Sick!', 1], //From 90% to 99%
+				['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
+			];
+		}
 		else
 		{
 			ratingStuff = [
@@ -1747,6 +1769,35 @@ class PlayState extends MusicBeatState
 		if (SONG.song.toLowerCase() == 'defeat')
 			setupHUD("Vs Impostor HUD");
 
+		var introTagColor:FlxColor = FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]);
+		var songName:String = SONG.song.replace("-", " ");
+
+        jukeBoxTag = new FlxSprite(-305 - introTagWidth, 15);
+        jukeBoxTag.makeGraphic(300 + introTagWidth, 100, introTagColor);
+        jukeBoxTag.cameras = [camOther];
+        add(jukeBoxTag);
+
+        jukeBox = new FlxSprite(-305 - introTagWidth, 15);
+        jukeBox.makeGraphic(300, 100, FlxColor.BLACK);
+        jukeBox.cameras = [camOther];
+        add(jukeBox);
+
+        jukeBoxText = new FlxText(-305 - introTagWidth, 30, 300, "Now Playing:", introTextSize);
+        jukeBoxText.setFormat(Paths.font("vcr.ttf"), introTextSize, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+        jukeBoxText.scrollFactor.set();
+		jukeBoxText.borderSize = 1.25;
+		jukeBoxText.antialiasing = ClientPrefs.globalAntialiasing;
+		jukeBoxText.cameras = [camOther];
+        add(jukeBoxText);
+
+        jukeBoxSubText = new FlxText(-305 - introTagWidth, 60, 300, songName, introTextSize);
+        jukeBoxSubText.setFormat(Paths.font("vcr.ttf"), introTextSize, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+        jukeBoxSubText.scrollFactor.set();
+		jukeBoxSubText.borderSize = 1.25;
+		jukeBoxSubText.antialiasing = ClientPrefs.globalAntialiasing;
+		jukeBoxSubText.cameras = [camOther];
+        add(jukeBoxSubText);
+
 		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayTxt.scrollFactor.set();
@@ -2275,7 +2326,8 @@ class PlayState extends MusicBeatState
 			{
 				if (ClientPrefs.gameHuds == "Myth Engine HUD")
 				{
-					timeBar.createGradientFilledBar([0xFFd7e98b, 0xFFd7a0ff], FlxColor.RED);
+					//timeBar.createGradientBar([0xFF000000, 0xFF000000], [0xFFd7e98b, 0xFFd7a0ff]);
+					//timeBar.createFilledBar(0xFF000000, 0xFFd7e98b);
 				}
 				else
 				{
@@ -3367,6 +3419,24 @@ class PlayState extends MusicBeatState
 	var lastReportedPlayheadPosition:Int = 0;
 	var songTime:Float = 0;
 
+	function doAllTheSongIntroStuff()
+	{
+		PlayState.instance.modchartTweens.set('MoveInOne', FlxTween.tween(jukeBoxTag, {x: 0}, 1, {ease: FlxEase.circInOut}));
+        PlayState.instance.modchartTweens.set('MoveInTwo', FlxTween.tween(jukeBox, {x: 0}, 1, {ease: FlxEase.circInOut}));
+        PlayState.instance.modchartTweens.set('MoveInThree', FlxTween.tween(jukeBoxText, {x: 0}, 1, {ease: FlxEase.circInOut}));
+        PlayState.instance.modchartTweens.set('MoveInFour', FlxTween.tween(jukeBoxSubText, {x: 0}, 1, {ease: FlxEase.circInOut}));
+
+        PlayState.instance.modchartTimers.set('JukeBoxWait', new FlxTimer().start(3, function(tmr:FlxTimer) {
+			if(tmr.finished) {
+				PlayState.instance.modchartTimers.remove('JukeBoxWait');
+			}
+            PlayState.instance.modchartTweens.set('MoveOutOne', FlxTween.tween(jukeBoxTag, {x: -450}, 1.5, {ease: FlxEase.circInOut}));
+            PlayState.instance.modchartTweens.set('MoveOutTwo', FlxTween.tween(jukeBox, {x: -450}, 1.5, {ease: FlxEase.circInOut}));
+            PlayState.instance.modchartTweens.set('MoveOutThree', FlxTween.tween(jukeBoxText, {x: -450}, 1.5, {ease: FlxEase.circInOut}));
+            PlayState.instance.modchartTweens.set('MoveOutFour', FlxTween.tween(jukeBoxSubText, {x: -450}, 1.5, {ease: FlxEase.circInOut}));
+		}, 1));
+	}
+
 	function startSong():Void
 	{
 		startingSong = false;
@@ -3391,7 +3461,12 @@ class PlayState extends MusicBeatState
 			vocals.pause();
 		}
 
-		if(!paused) {
+		if (!paused)
+		{
+			doAllTheSongIntroStuff();
+		}
+
+		/*if(!paused) {
 			if (task != null)
 			{
 				task.start();
@@ -3404,7 +3479,7 @@ class PlayState extends MusicBeatState
 			{
 				task3.start();
 			}
-		}
+		}*/
 
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
@@ -5471,6 +5546,7 @@ class PlayState extends MusicBeatState
 				var val1 = Std.parseFloat(value1);
 				var val2 = Std.parseFloat(value2);
 				var val3 = Std.parseFloat(value3);
+				var dynamicVal:Dynamic = val3;
 
 				if (!Math.isNaN(val1))
 				{
@@ -5480,7 +5556,7 @@ class PlayState extends MusicBeatState
 					}
 					else
 					{
-						modchartTweens.set("Camera Zoom", FlxTween.tween(camGame, {zoom: val1}, val2, {ease: (Math.isNaN(val3) ? FlxEase.sineInOut : val3),
+						modchartTweens.set("Camera Zoom", FlxTween.tween(camGame, {zoom: val1}, val2, {ease: (Math.isNaN(val3) ? FlxEase.sineInOut : dynamicVal),
 							onComplete: function(twn:FlxTween)
 							{
 								defaultCamZoom = camGame.zoom;
@@ -6307,7 +6383,7 @@ class PlayState extends MusicBeatState
 	public function healthTween(amt:Float) /// from Indie Cross lol
 	{
 		healthTweenObj.cancel();
-		healthTweenObj = FlxTween.num(health, health + amt, 0.2, {ease: FlxEase.quadInOut}, function(v:Float)
+		healthTweenObj = FlxTween.num(health, health + amt, 0.2, {ease: FlxEase.sineInOut}, function(v:Float)
 		{
 			health = v;
 		});
@@ -6329,7 +6405,7 @@ class PlayState extends MusicBeatState
 	public function healthTween2(amt:Float) /// from Indie Cross lol
 	{
 		healthTweenObj2.cancel();
-		healthTweenObj2 = FlxTween.num(health, health + amt, 0.2, {ease: FlxEase.quadInOut}, function(v:Float)
+		healthTweenObj2 = FlxTween.num(health, health + amt, 0.2, {ease: FlxEase.sineInOut}, function(v:Float)
 		{
 			health = v;
 		});
@@ -8071,6 +8147,7 @@ class PlayState extends MusicBeatState
 			if(totalPlayed < 1) { //Prevent divide by 0
 				ratingName = '?';
 				judgementRatingFC = " [?]";
+				ratingAward = "N/A";
 				if (ClientPrefs.gameHuds == "Vs Impostor HUD") ratingFC = "?";
 			}
 			else
