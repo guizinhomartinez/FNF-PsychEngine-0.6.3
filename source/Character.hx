@@ -27,6 +27,8 @@ typedef CharacterFile = {
 	var sing_duration:Float;
 	var healthicon:String;
 	var noteskin:String;
+	var isPlayerChar:Bool;
+	var custom_player_offsets:Bool;
 
 	var position:Array<Float>;
 	var camera_position:Array<Float>;
@@ -72,6 +74,8 @@ class Character extends FlxSprite
 	public var cameraPosition:Array<Float> = [0, 0];
 
 	public var hasMissAnimations:Bool = false;
+
+	public var isPsychPlayer:Bool = false;
 
 	//Used on Character Editor
 	public var imageFile:String = '';
@@ -186,6 +190,11 @@ class Character extends FlxSprite
 				healthIcon = json.healthicon;
 				singDuration = json.sing_duration;
 				flipX = !!json.flip_x;
+
+				if (json.isPlayerChar){
+					isPsychPlayer = json.isPlayerChar;
+				}
+
 				if(json.no_antialiasing) {
 					antialiasing = false;
 					noAntialiasing = true;
@@ -230,6 +239,15 @@ class Character extends FlxSprite
 		if (isPlayer)
 		{
 			flipX = !flipX;
+
+			// if (isPsychPlayer)
+				// flipAnims();
+		}
+
+		if (!isPlayer)
+		{
+			// if (!isPsychPlayer)
+				// flipAnims();
 		}
 
 		switch(curCharacter)
@@ -405,5 +423,20 @@ class Character extends FlxSprite
 	public function quickAnimAdd(name:String, anim:String)
 	{
 		animation.addByPrefix(name, anim, 24, false);
+	}
+
+	public function flipAnims()
+	{
+		var animSuf:Array<String> = ["", "miss", "-alt", "-alt2", "-loop"];
+
+		for (i in 0...animSuf.length)
+		{
+			if (animation.getByName('singRIGHT' + animSuf[i]) != null && animation.getByName('singLEFT' + animSuf[i]) != null)
+			{
+				var oldRight = animation.getByName('singRIGHT' + animSuf[i]).frames;
+				animation.getByName('singRIGHT' + animSuf[i]).frames = animation.getByName('singLEFT' + animSuf[i]).frames;
+				animation.getByName('singLEFT' + animSuf[i]).frames = oldRight;
+			}
+		}
 	}
 }

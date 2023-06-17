@@ -61,7 +61,7 @@ class VisualsUISubState extends BaseOptionsMenu
 			'gameHuds',
 			'string',
 			'New HUD',
-			['New HUD', 'Vs Impostor HUD', 'Sacorg HUD', 'Myth Engine HUD', 'Default']);
+			['Blantados HUD', 'New HUD', 'Vs Impostor HUD', 'Sacorg HUD', 'Myth Engine HUD', 'Default']);
 		addOption(option);
 
 		var option:Option = new Option('Smooth Health',
@@ -70,6 +70,27 @@ class VisualsUISubState extends BaseOptionsMenu
 			'Bool',
 			false);
 		addOption(option);
+
+		var option:Option = new Option('Judgement Counter',
+			"If enabled, a judgement counter will be added to your screen, displaying all the information needed.",
+			'judgementCounter',
+			'Bool',
+			true);
+		addOption(option);
+
+		var option:Option = new Option('Dynamic Ratings',
+			"If enabled, the ratings displayed on screen will always have a different angle\n and they will also disappear when the next shows up.",
+			'dynamicRatings',
+			'Bool',
+			true);
+		addOption(option);
+
+		/*var option:Option = new Option('no Flickering animation',
+			"If enabled, will disable the flickering caused by long notes",
+			'noLongNoteFlickering',
+			'Bool',
+			false);
+		addOption(option);*/
 
 		var option:Option = new Option('Flashing Lights',
 			"Uncheck this if you're sensitive to flashing lights!",

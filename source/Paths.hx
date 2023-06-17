@@ -23,6 +23,9 @@ import haxe.Json;
 
 import flash.media.Sound;
 
+import openfl.display3D.textures.Texture;
+import openfl.geom.Matrix;
+
 using StringTools;
 
 class Paths
@@ -295,6 +298,54 @@ class Paths
 		return 'assets/fonts/$key';
 	}
 
+	public static var currentTrackedTextures:Map<String, Texture> = [];
+	public static var currentTrackedTexts:Map<String, String> = [];
+
+	// for uncaching midsong?
+	public static function clearStoredMemory2(key:String, ?type:String = 'image') {
+		// clear anything not in the tracked assets list
+		trace ('uncaching ' + key);
+
+		if (type == 'sound')
+		{
+			openfl.Assets.cache.clear(key);
+
+			if(currentTrackedSounds.exists(key)) 
+			{
+				currentTrackedSounds.remove(key);
+				trace('removed ' + key);
+			}
+		}
+		else
+		{
+			@:privateAccess
+			var obj = FlxG.bitmap._cache.get(key);
+		
+			if (currentTrackedTextures.exists(key)) {
+				var texture:Null<Texture> = currentTrackedTextures.get(key);
+				texture.dispose();
+				texture = null;
+				currentTrackedTextures.remove(key);
+			}
+			
+			if (obj != null)
+			{
+				openfl.Assets.cache.removeBitmapData(key);
+				@:privateAccess
+				FlxG.bitmap._cache.remove(key);
+				obj.destroy();
+	
+				if(currentTrackedAssets.exists(key)) 
+					currentTrackedAssets.remove(key);
+
+				trace ('success!');
+			}
+		}
+		
+		System.gc();
+		trace ('check memory boi');
+	}
+
 	inline static public function fileExists(key:String, type:AssetType, ?ignoreMods:Bool = false, ?library:String)
 	{
 		#if MODS_ALLOWED
@@ -359,6 +410,7 @@ class Paths
 				newGraphic.persist = true;
 				currentTrackedAssets.set(modKey, newGraphic);
 			}
+
 			localTrackedAssets.push(modKey);
 			return currentTrackedAssets.get(modKey);
 		}

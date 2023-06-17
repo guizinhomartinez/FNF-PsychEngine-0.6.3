@@ -126,7 +126,7 @@ class PlayState extends MusicBeatState
 	];
 
 	//event variables
-	private var isCameraOnForcedPos:Bool = false;
+	public var isCameraOnForcedPos:Bool = false;
 
 	#if (haxe >= "4.0.0")
 	public var boyfriendMap:Map<String, Boyfriend> = new Map();
@@ -217,7 +217,7 @@ class PlayState extends MusicBeatState
 	public var unspawnNotes:Array<Note> = [];
 	public var eventNotes:Array<EventNote> = [];
 
-	private var strumLine:FlxSprite;
+	public var strumLine:FlxSprite;
 
 	//Handles the new epic mega sexy cam code that i've done
 	public var camFollow:FlxPoint;
@@ -375,8 +375,6 @@ class PlayState extends MusicBeatState
 
 	public var nps:Int = 0;
 	public var maxNps:Int = 0;
-	public var npsRefresh1:Int = 0;
-	public var npsRefresh2:Int = 0;
 
 	public var scoreTxt:FlxText;
 
@@ -582,6 +580,8 @@ class PlayState extends MusicBeatState
 	var introSubTextSize:Int = 30;
 	var introTagWidth:Int = 15;
 
+	var usedTimeTravel:Bool = false;
+
 	override public function create()
 	{
 		lastMustHit = SONG.notes[curSection].mustHitSection;
@@ -592,60 +592,70 @@ class PlayState extends MusicBeatState
 
 		if (SONG.song == 'Haxxer' || SONG.song == 'Super Idol') nostalgicSongs = true;
 
-		if (ClientPrefs.gameHuds == "Sacorg HUD")
+		switch (ClientPrefs.gameHuds)
 		{
-			ratingStuff = [
-				['You Suck!', 0.2], //From 0% to 19%
-				['Shit', 0.4], //From 20% to 39%
-				['Bad', 0.5], //From 40% to 49%
-				['Bruh', 0.6], //From 50% to 59%
-				['Meh', 0.69], //From 60% to 68%
-				['Nice', 0.7], //69%
-				['Good', 0.8], //From 70% to 79%
-				['Great', 0.9], //From 80% to 89%
-				['Sick!', 1], //From 90% to 99%
-				['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
-			];
-		}
-		else if (ClientPrefs.gameHuds == "Myth Engine HUD")
-		{
-			ratingRankStuff = [
-				['N/A', 0.1099], //From 0% to 19%
-				['D', 0.5999], //From 20% to 39%
-				['C', 0.7099], //From 40% to 49%
-				['B', 0.7999], //69%
-				['A', 0.8099], //From 70% to 79%
-				['A.', 0.8599], //From 80% to 89%
-				['A:', 0.9], //From 90% to 99%
-				['AA', 1] //The value on this one isn't used actually, since Perfect is always "1"
-			];
+			case "Sacorg HUD":
+				ratingStuff = [
+					['You Suck!', 0.2], //From 0% to 19%
+					['Shit', 0.4], //From 20% to 39%
+					['Bad', 0.5], //From 40% to 49%
+					['Bruh', 0.6], //From 50% to 59%
+					['Meh', 0.69], //From 60% to 68%
+					['Nice', 0.7], //69%
+					['Good', 0.8], //From 70% to 79%
+					['Great', 0.9], //From 80% to 89%
+					['Sick!', 1], //From 90% to 99%
+					['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
+				];
+			case "Myth Engine HUD":
+				ratingRankStuff = [
+					['N/A', 0.1099], //From 0% to 19%
+					['D', 0.5999], //From 20% to 39%
+					['C', 0.7099], //From 40% to 49%
+					['B', 0.7999], //69%
+					['A', 0.8099], //From 70% to 79%
+					['A.', 0.8599], //From 80% to 89%
+					['A:', 0.9], //From 90% to 99%
+					['AA', 1] //The value on this one isn't used actually, since Perfect is always "1"
+				];
 
-			ratingStuff = [
-				['You Suck!', 0.2], //From 0% to 19%
-				['Shit', 0.4], //From 20% to 39%
-				['Bad', 0.5], //From 40% to 49%
-				['Bruh', 0.6], //From 50% to 59%
-				['Meh', 0.69], //From 60% to 68%
-				['Nice', 0.7], //69%
-				['Good', 0.8], //From 70% to 79%
-				['Great', 0.9], //From 80% to 89%
-				['Sick!', 1], //From 90% to 99%
-				['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
-			];
-		}
-		else
-		{
-			ratingStuff = [
-				['N/A', 0.6499],
-				['F', 0.6599], //From 0% to 19%
-				['E', 0.7099], //From 20% to 39%
-				['D', 0.7599], //From 40% to 49%
-				['C', 0.8099], //From 50% to 59%
-				['B', 0.8599], //From 60% to 68%
-				['A', 0.9099], //From 80% to 89%
-				['S', 0.9999], //From 90% to 99%
-				['S+', 1] //The value on this one isn't used actually, since Perfect is always "1"
-			];
+				ratingStuff = [
+					['You Suck!', 0.2], //From 0% to 19%
+					['Shit', 0.4], //From 20% to 39%
+					['Bad', 0.5], //From 40% to 49%
+					['Bruh', 0.6], //From 50% to 59%
+					['Meh', 0.69], //From 60% to 68%
+					['Nice', 0.7], //69%
+					['Good', 0.8], //From 70% to 79%
+					['Great', 0.9], //From 80% to 89%
+					['Sick!', 1], //From 90% to 99%
+					['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
+				];
+			case "Blantados HUD":
+				ratingStuff = [
+					['You Suck!', 0.2], //From 0% to 19%
+					['Shit', 0.4], //From 20% to 39%
+					['Bad', 0.5], //From 40% to 49%
+					['Bruh', 0.6], //From 50% to 59%
+					['Meh', 0.69], //From 60% to 68%
+					['Nice', 0.7], //69%
+					['Good', 0.8], //From 70% to 79%
+					['Great', 0.9], //From 80% to 89%
+					['Sick!', 1], //From 90% to 99%
+					['Perfect!!', 1] //The value on this one isn't used actually, since Perfect is always "1"
+				];
+			default:
+				ratingStuff = [
+					['N/A', 0.6499],
+					['F', 0.6599], //From 0% to 19%
+					['E', 0.7099], //From 20% to 39%
+					['D', 0.7599], //From 40% to 49%
+					['C', 0.8099], //From 50% to 59%
+					['B', 0.8599], //From 60% to 68%
+					['A', 0.9099], //From 80% to 89%
+					['S', 0.9999], //From 90% to 99%
+					['S+', 1] //The value on this one isn't used actually, since Perfect is always "1"
+				];
 		}
 
 		// for lua
@@ -1763,7 +1773,7 @@ class PlayState extends MusicBeatState
 		judgementCounter.antialiasing = ClientPrefs.globalAntialiasing;
 		judgementCounter.visible = !ClientPrefs.hideHud;
 		judgementCounter.screenCenter(Y);
-		add(judgementCounter);
+		if (ClientPrefs.judgementCounter) add(judgementCounter);
 
 		setupHUD(ClientPrefs.gameHuds);
 		if (SONG.song.toLowerCase() == 'defeat')
@@ -2326,8 +2336,7 @@ class PlayState extends MusicBeatState
 			{
 				if (ClientPrefs.gameHuds == "Myth Engine HUD")
 				{
-					//timeBar.createGradientBar([0xFF000000, 0xFF000000], [0xFFd7e98b, 0xFFd7a0ff]);
-					//timeBar.createFilledBar(0xFF000000, 0xFFd7e98b);
+					timeBar.alpha = 0.0001;
 				}
 				else
 				{
@@ -3290,81 +3299,72 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		/*if (sonicExeTxt || SONG.song.toLowerCase() == 'feijao') {
-			scoreTxt.text = 'Score: ' + songScore
-			+ ' | Combo Breaks: ' + songMisses
-			+ ' | Accuracy: ' + (ratingName == '?' ? ratingName : '${Highscore.floorDecimal(ratingPercent * 100, 2)}%') + (songMisses == 0 && songHits > 0 ? ' [$ratingFC]' : '');
-		} else {
-			scoreTxt.text = 'Score: ' + songScore
-			+ ' | Misses: ' + songMisses
-			+ ' | Rating: ' + ratingName
-			+ (ratingName != '?' ? ' (${Highscore.floorDecimal(ratingPercent * 100, 2)}%) - $ratingFC' : '');
-		}*/
-
-		if (ClientPrefs.gameHuds != "Vs Impostor HUD")
+		switch (ClientPrefs.gameHuds)
 		{
-			if(ratingName == '?') 
-			{
-				scoreTxt.text = 'Score: ' + songScore 
-				+ ' | Combo Breaks: ' + songMisses 
-				+ ' | Accuracy: ?';
-			}
-			else
-			{
-				scoreTxt.text = 'Score: ' + songScore 
-				+ ' | Combo Breaks: ' + songMisses 
-				+ ' | Accuracy: ' + convertedAccDisplay + '%' 
-				+ ' | ' + ratingName + (songMisses < 1 ? ' [$ratingFC]' : '');
-			}
-		}
-		else
-		{
-			if (ratingName == '?')
-			{
+			case "Vs Impostor HUD":
+				if (ratingName == '?')
+				{
+					scoreTxt.text = 'Score: ' + songScore
+					+ ' | Combo Breaks: ' + songMisses
+					+ ' | Accuracy: ?';
+				}
+				else
+				{
+					scoreTxt.text = 'Score: ' + songScore
+					+ ' | Combo Breaks: ' + songMisses
+					+ ' | Accuracy: ' + convertedAccDisplay + '%' + (shits > 0 || songMisses > 0 ? '' : ratingString);
+				}
+			case "Sacorg HUD":
 				scoreTxt.text = 'Score: ' + songScore
-				+ ' | Combo Breaks: ' + songMisses
-				+ ' | Accuracy: ?';
-			}
-			else
-			{
-				scoreTxt.text = 'Score: ' + songScore
-				+ ' | Combo Breaks: ' + songMisses
-				+ ' | Accuracy: ' + convertedAccDisplay + '%' + (shits > 0 || songMisses > 0 ? '' : ratingString);
-			}
-		}
-
-		if (ClientPrefs.gameHuds == "Sacorg HUD")
-		{
-			scoreTxt.text = 'Score: ' + songScore
-			+ '\nMisses: ' + songMisses
-			+ '\nRating: ' + ratingName
-			+ (ratingName != '?' ? ' (${Highscore.floorDecimal(ratingPercent * 100, 2)}%) - $ratingFC' : '');
-		}
-
-		if (ClientPrefs.gameHuds == "Myth Engine HUD")
-		{
-			if (ratingName == "?")
-			{
-				scoreTxt.text = "NPS: " + nps + " (" + maxNps + ")"
-				+ " | Score: " + songScore
-				+ " | Misses:" + songMisses
-				+ " | Rating: " + ratingName;
-			}
-			else
-			{
-				scoreTxt.text = "NPS: " + nps + " (" + maxNps + ")"
-				+ " | Score: " + songScore
+				+ '\nMisses: ' + songMisses
+				+ '\nRating: ' + ratingName
+				+ (ratingName != '?' ? ' (${Highscore.floorDecimal(ratingPercent * 100, 2)}%) - $ratingFC' : '');
+			case "Myth Engine HUD":
+				if (ratingName == "?" || ratingAward == "N/A")
+				{
+					scoreTxt.text = "NPS: " + nps + " (" + maxNps + ")"
+					+ " | Score: " + songScore
+					+ " | Misses:" + songMisses
+					+ " | Rating: " + ratingName;
+				}
+				else
+				{
+					scoreTxt.text = "NPS: " + nps + " (" + maxNps + ")"
+					+ " | Score: " + songScore
+					+ " | Misses: " + songMisses
+					+ " | Rating: " + ratingName + " (" + convertedAccDisplay + "%" + ")" +  " - " + "(" + ratingFC + ") " + ratingAward;
+				}
+			case "Blantados HUD":
+				scoreTxt.text = "Score: " + songScore
 				+ " | Misses: " + songMisses
-				+ " | Rating: " + ratingName + " (" + convertedAccDisplay + "%" + ")" +  " - " + "(" + ratingFC + ") " + ratingAward;
-			}
+				+ " | Rating: " + ratingName + " (" + convertedAccDisplay + "%" + ")" + " - " + (ratingName != "You Suck!" ? ratingFC : "?");
+			default:
+				if(ratingName == '?') 
+				{
+					scoreTxt.text = 'Score: ' + songScore 
+					+ ' | Combo Breaks: ' + songMisses 
+					+ ' | Accuracy: ?';
+				}
+				else
+				{
+					if (songMisses < 1)
+					{
+						scoreTxt.text = 'Score: ' + songScore 
+						+ ' | Combo Breaks: ' + songMisses 
+						+ ' | Accuracy: ' + convertedAccDisplay + '%' 
+						+ ' | ' + ratingName + " [" + ratingFC + "]";
+					}
+					else
+					{
+						scoreTxt.text = 'Score: ' + songScore 
+						+ ' | Combo Breaks: ' + songMisses 
+						+ ' | Accuracy: ' + convertedAccDisplay + '%' 
+						+ ' | ' + ratingName;
+					}
+				}
 		}
 
-		/*scoreTxt.text = 'Score: ' + songScore
-		+ ' | Misses: ' + songMisses
-		+ ' | Rating: ' + ratingName
-		+ ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%' + ')' + ' - ' + (songHits > 0 ? '$ratingFC' : '?');*/
-
-		if(ClientPrefs.scoreZoom && !miss && !noKicking)
+		if(ClientPrefs.scoreZoom && !miss && !noKicking && ClientPrefs.gameHuds != "Blantados HUD")
 		{
 			if(scoreTxtTween != null) {
 				scoreTxtTween.cancel();
@@ -3377,6 +3377,7 @@ class PlayState extends MusicBeatState
 				}
 			});
 		}
+
 		callOnLuas('onUpdateScore', [miss]);
 		callOnLuas('onUpdateScore', [noKicking]);
 
@@ -3435,6 +3436,30 @@ class PlayState extends MusicBeatState
             PlayState.instance.modchartTweens.set('MoveOutThree', FlxTween.tween(jukeBoxText, {x: -450}, 1.5, {ease: FlxEase.circInOut}));
             PlayState.instance.modchartTweens.set('MoveOutFour', FlxTween.tween(jukeBoxSubText, {x: -450}, 1.5, {ease: FlxEase.circInOut}));
 		}, 1));
+	}
+
+	public function setupCountdownSprite(spr:String, graphicName:String, soundName:String)
+	{
+		var countdown:FlxSprite = Reflect.getProperty(PlayState.instance, spr);
+		countdown.scrollFactor.set();
+						
+		if (graphicName.contains("-pixel")){
+			countdown.setGraphicSize(Std.int(countdown.width * daPixelZoom));
+		}
+			
+		countdown.cameras = [camHUD];
+		countdown.updateHitbox();
+		countdown.screenCenter();
+		add(countdown);
+		
+		FlxTween.tween(countdown, {y: countdown.y + 25, alpha: 0}, Conductor.crochet / 1000, {
+			ease: FlxEase.cubeInOut,
+			onComplete: function(twn:FlxTween)
+			{
+				countdown.destroy();
+			}
+		});
+		FlxG.sound.play((soundName != null ? soundName : Paths.sound("cancelMenu")), 0.6);
 	}
 
 	function startSong():Void
@@ -4109,7 +4134,7 @@ class PlayState extends MusicBeatState
 		super.onFocusLost();
 	}
 
-	function resyncVocals():Void
+	public function resyncVocals():Void
 	{
 		if(finishTimer != null) return;
 
@@ -4140,8 +4165,10 @@ class PlayState extends MusicBeatState
 			{
 				scoreTxt.color = FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]);
 			}
-
-			scoreTxt.color = FlxColor.RED;
+			else
+			{
+				scoreTxt.color = FlxColor.RED;
+			}
 		}
 
 		popUpNoteCombo();
@@ -4154,17 +4181,6 @@ class PlayState extends MusicBeatState
 			healthBarOverlay.x = healthBar.x - 55;
 			healthBarOverlay.y = healthBar.y - 20;
 		}
-
-		/*var lastScale:Float = dad.scale.x;
-		dad.scale.x = 1;
-		if (FlxG.keys.justPressed.SPACE)
-		{
-			dad.scale.x = 100;
-		}
-		else
-		{
-			dad.scale.x = lastScale;
-		}*/
 
 		//camHUD.angle = Math.sin((Conductor.songPosition / 1200) * (Conductor.bpm / 60) * -1.0) * 1.2;
 
@@ -5968,6 +5984,11 @@ class PlayState extends MusicBeatState
 	}
 	#end
 
+	public function NearlyEquals(value1:Float, value2:Float, unimportantDifference:Float = 10):Bool
+	{
+		return Math.abs(FlxMath.roundDecimal(value1, 1) - FlxMath.roundDecimal(value2, 1)) < unimportantDifference;
+	}
+
 	public function KillNotes()
 	{
 		while(notes.length > 0) {
@@ -6006,7 +6027,13 @@ class PlayState extends MusicBeatState
 		ghost.x = player.x;
 		ghost.y = player.y;
 		ghost.animation.play(animToPlay, true);
-		ghost.offset.set(player.animOffsets.get(animToPlay)[0], player.animOffsets.get(animToPlay)[1]);
+		try {
+			ghost.offset.set(player.animOffsets.get(animToPlay)[0], player.animOffsets.get(animToPlay)[1]);
+		}
+		catch (e:Dynamic)
+		{
+			trace(e);
+		}
 		ghost.flipX = player.flipX;
 		ghost.flipY = player.flipY;
 		ghost.blend = HARDLIGHT;
@@ -6279,7 +6306,10 @@ class PlayState extends MusicBeatState
 		rating.velocity.y -= FlxG.random.int(140, 175) * playbackRate;
 		rating.velocity.x -= FlxG.random.int(0, 10) * playbackRate;
 		rating.visible = (!ClientPrefs.hideHud && showRating);
-		rating.angle = FlxG.random.int(-10, 10);
+		if (ClientPrefs.dynamicRatings)
+		{
+			rating.angle = FlxG.random.int(-10, 10);
+		}
 
 		ratingGroup.add(rating);
 		
@@ -6501,7 +6531,10 @@ class PlayState extends MusicBeatState
 		rating.velocity.y -= FlxG.random.int(140, 175) * playbackRate;
 		rating.velocity.x -= FlxG.random.int(0, 10) * playbackRate;
 		rating.visible = (!ClientPrefs.hideHud && showRating);
-		rating.angle = FlxG.random.int(-10, 10);
+		if (ClientPrefs.dynamicRatings)
+		{
+			rating.angle = FlxG.random.int(-10, 10);
+		}
 
 		var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
 		comboSpr.screenCenter();
@@ -6512,7 +6545,10 @@ class PlayState extends MusicBeatState
 		comboSpr.visible = (!ClientPrefs.hideHud && showCombo);
 		comboSpr.y += 60;
 		comboSpr.velocity.x += FlxG.random.int(1, 10) * playbackRate;
-		comboSpr.angle = FlxG.random.int(-10, 10);
+		if (ClientPrefs.dynamicRatings)
+		{
+			comboSpr.angle = FlxG.random.int(-10, 10);
+		}
 
 		ratingGroup.add(rating);
 		
@@ -6594,7 +6630,10 @@ class PlayState extends MusicBeatState
 			numScore.acceleration.y = FlxG.random.int(200, 300) * playbackRate * playbackRate;
 			numScore.velocity.y -= FlxG.random.int(140, 160) * playbackRate;
 			numScore.velocity.x = FlxG.random.float(-5, 5) * playbackRate;
-			numScore.angle = FlxG.random.int(-10, 10);
+			if (ClientPrefs.dynamicRatings)
+			{
+				numScore.angle = FlxG.random.int(-10, 10);
+			}
 			numScore.visible = !ClientPrefs.hideHud;
 
 			if(showComboNum) {
@@ -6609,21 +6648,25 @@ class PlayState extends MusicBeatState
 				startDelay: Conductor.crochet * 0.002
 			});
 
-			numScoreTween = FlxTween.tween(numScore.scale, {x: 0}, 0.2 / playbackRate, {
-				onComplete: function(tween:FlxTween)
-				{
-					numScore.destroy();
-				},
-				startDelay: Conductor.crochet * 0.002
-			});
+			if (ClientPrefs.dynamicRatings)
+			{
+				numScoreTween = FlxTween.tween(numScore.scale, {x: 0}, 0.2 / playbackRate, {
+					onComplete: function(tween:FlxTween)
+					{
+						numScore.destroy();
+					},
+					startDelay: Conductor.crochet * 0.002
+				});
 
-			numScoreTween = FlxTween.tween(numScore.scale, {y: 0}, 0.2 / playbackRate, {
-				onComplete: function(tween:FlxTween)
-				{
-					numScore.destroy();
-				},
-				startDelay: Conductor.crochet * 0.002
-			});
+				numScoreTween = FlxTween.tween(numScore.scale, {y: 0}, 0.2 / playbackRate, {
+					onComplete: function(tween:FlxTween)
+					{
+						numScore.destroy();
+					},
+					startDelay: Conductor.crochet * 0.002
+				});
+			}
+
 
 			daLoop++;
 			if(numScore.x > xThing) xThing = numScore.x;
@@ -6643,13 +6686,16 @@ class PlayState extends MusicBeatState
 			startDelay: Conductor.crochet * 0.001
 		});
 
-		ratingTween = FlxTween.tween(rating.scale, {x: 0}, 0.2 / playbackRate, {
-			startDelay: Conductor.crochet * 0.001
-		});
-
-		ratingTween = FlxTween.tween(rating.scale, {y: 0}, 0.2 / playbackRate, {
-			startDelay: Conductor.crochet * 0.001
-		});
+		if (ClientPrefs.dynamicRatings)
+		{
+			ratingTween = FlxTween.tween(rating.scale, {x: 0}, 0.2 / playbackRate, {
+				startDelay: Conductor.crochet * 0.001
+			});
+	
+			ratingTween = FlxTween.tween(rating.scale, {y: 0}, 0.2 / playbackRate, {
+				startDelay: Conductor.crochet * 0.001
+			});
+		}
 
 		comboTween = FlxTween.tween(comboSpr, {alpha: 0}, 0.2 / playbackRate, {
 			onComplete: function(tween:FlxTween)
@@ -6662,13 +6708,17 @@ class PlayState extends MusicBeatState
 			startDelay: Conductor.crochet * 0.002 / playbackRate
 		});
 
-		comboTween = FlxTween.tween(comboSpr.scale, {x: 0}, 0.2 / playbackRate, {
-			startDelay: Conductor.crochet * 0.002 / playbackRate
-		});
+		if (ClientPrefs.dynamicRatings)
+		{
+			comboTween = FlxTween.tween(comboSpr.scale, {x: 0}, 0.2 / playbackRate, {
+				startDelay: Conductor.crochet * 0.002 / playbackRate
+			});
+	
+			comboTween = FlxTween.tween(comboSpr.scale, {y: 0}, 0.2 / playbackRate, {
+				startDelay: Conductor.crochet * 0.002 / playbackRate
+			});
+		}
 
-		comboTween = FlxTween.tween(comboSpr.scale, {y: 0}, 0.2 / playbackRate, {
-			startDelay: Conductor.crochet * 0.002 / playbackRate
-		});
 	}
 
 	public var strumsBlocked:Array<Bool> = [];
@@ -7405,7 +7455,6 @@ class PlayState extends MusicBeatState
 				combo += 1;
 				if(combo > 9999) combo = 9999;
 				popUpScore(note);
-				npsRefresh1 += 1;
 				if (!nostalgicSongs)
 				{
 					if (!ClientPrefs.smoothHealth)
@@ -8111,6 +8160,85 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
+	public function doTimeTravel(shiftPressed:Bool = false, ?skipExactly:Int = 0)
+	{
+		var multiplier:Int = 1;
+		if (shiftPressed)multiplier = 6; //we skippin minutes now
+
+		if (skipExactly != 0)
+		{
+			if (!usedTimeTravel && skipExactly < FlxG.sound.music.length) 
+			{
+				usedTimeTravel = true;
+				FlxG.sound.music.pause();
+				vocals.pause();
+				Conductor.songPosition = skipExactly;
+				notes.forEachAlive(function(daNote:Note)
+				{
+					if(daNote.strumTime - 500 < Conductor.songPosition) {
+						daNote.active = false;
+						daNote.visible = false;
+					
+						daNote.kill();
+						notes.remove(daNote, true);
+						daNote.destroy();
+					}
+				});
+				for (i in 0...unspawnNotes.length) {
+					var daNote:Note = unspawnNotes[0];
+					if(daNote.strumTime - 500 >= Conductor.songPosition) {
+						break;
+					}
+					unspawnNotes.splice(unspawnNotes.indexOf(daNote), 1);
+				}
+				FlxG.sound.music.time = Conductor.songPosition;
+				FlxG.sound.music.play();
+				vocals.time = Conductor.songPosition;
+				vocals.play();
+				new FlxTimer().start(0.5, function(tmr:FlxTimer)
+					{
+						usedTimeTravel = false;
+					});
+			}
+		}
+		else
+		{
+			if (!usedTimeTravel && Conductor.songPosition + 10000 * multiplier < FlxG.sound.music.length) 
+			{
+				usedTimeTravel = true;
+				FlxG.sound.music.pause();
+				vocals.pause();
+				Conductor.songPosition += 10000 * multiplier;
+				notes.forEachAlive(function(daNote:Note)
+				{
+					if(daNote.strumTime - 500 < Conductor.songPosition) {
+						daNote.active = false;
+						daNote.visible = false;
+					
+						daNote.kill();
+						notes.remove(daNote, true);
+						daNote.destroy();
+					}
+				});
+				for (i in 0...unspawnNotes.length) {
+					var daNote:Note = unspawnNotes[0];
+					if(daNote.strumTime - 500 >= Conductor.songPosition) {
+						break;
+					}
+					unspawnNotes.splice(unspawnNotes.indexOf(daNote), 1);
+				}
+				FlxG.sound.music.time = Conductor.songPosition;
+				FlxG.sound.music.play();
+				vocals.time = Conductor.songPosition;
+				vocals.play();
+				new FlxTimer().start(0.5, function(tmr:FlxTimer)
+					{
+						usedTimeTravel = false;
+					});
+			}
+		}	
+	}
+
 	function StrumPlayAnim(note:Note = null, isDad:Bool, id:Int, time:Float) {
 		var spr:StrumNote = null;
 		if(isDad) {
@@ -8145,7 +8273,15 @@ class PlayState extends MusicBeatState
 		if(ret != FunkinLua.Function_Stop)
 		{
 			if(totalPlayed < 1) { //Prevent divide by 0
-				ratingName = '?';
+				if (ClientPrefs.gameHuds == "Blantados HUD")
+				{
+					ratingName = 'You Suck!';
+				}
+				else
+				{
+					ratingName = '?';
+				}
+
 				judgementRatingFC = " [?]";
 				ratingAward = "N/A";
 				if (ClientPrefs.gameHuds == "Vs Impostor HUD") ratingFC = "?";
@@ -8159,6 +8295,7 @@ class PlayState extends MusicBeatState
 				if(ratingPercent >= 1)
 				{
 					ratingName = ratingStuff[ratingStuff.length-1][0]; //Uses last string
+					ratingAward = ratingRankStuff[ratingRankStuff.length-1][0]; //Uses last string
 				}
 				else
 				{
@@ -8170,19 +8307,12 @@ class PlayState extends MusicBeatState
 							break;
 						}
 					}
-				}
 
-				if(ratingPercent >= 1)
-				{
-					ratingAward = ratingRankStuff[ratingRankStuff.length-1][0]; //Uses last string
-				}
-				else
-				{
 					for (i in 0...ratingRankStuff.length-1)
 					{
 						if(ratingPercent < ratingRankStuff[i][1])
 						{
-							ratingName = ratingRankStuff[i][0];
+							ratingAward = ratingRankStuff[i][0];
 							break;
 						}
 					}

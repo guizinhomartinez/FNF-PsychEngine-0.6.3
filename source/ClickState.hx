@@ -25,8 +25,6 @@ class ClickState extends MusicBeatState
 
 	override public function create()
     {
-        // ClientPrefs.framerate = 240;
-
         Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
 
@@ -86,7 +84,25 @@ class ClickState extends MusicBeatState
         }
         #end
 
-		if(controls.BACK)
+        #if desktop
+        if (FlxG.keys.justPressed.BACKSPACE)
+        {
+            curNumber--;
+            FlxG.sound.play(Paths.sound('tick', 'preload'), 1);
+			if(numbersTween != null) {
+				numbersTween.cancel();
+			}
+			numbers.scale.x = -1;
+			numbers.scale.y = -1;
+			numbersTween = FlxTween.tween(numbers.scale, {x: 1, y: 1}, 0.2, {
+				onComplete: function(twn:FlxTween) {
+					numbersTween = null;
+				}
+			});
+        }
+        #end
+
+		if(FlxG.keys.justPressed.ESCAPE)
         {
             MusicBeatState.switchState(new MainMenuState());
             backToMain = true;

@@ -2009,6 +2009,28 @@ class FunkinLua {
 			PlayState.instance.changeBF2Char(name, x, y);
 		});
 
+		Lua_helper.add_callback(lua,"setCamFollow", function(x:Float, y:Float) {
+			PlayState.instance.isCameraOnForcedPos = true;
+			PlayState.instance.camFollow.set(x, y);
+		});
+
+		Lua_helper.add_callback(lua,"offCamFollow", function(id:String) {
+			PlayState.instance.isCameraOnForcedPos = false;
+		});
+
+		Lua_helper.add_callback(lua,"snapCam", function(x:Float, y:Float) {
+			PlayState.instance.isCameraOnForcedPos = true;
+			
+			var camPosition:FlxObject = new FlxObject(0, 0, 1, 1);
+			camPosition.setPosition(x, y);
+			FlxG.camera.focusOn(camPosition.getPosition());
+		});
+
+		Lua_helper.add_callback(lua, "setStrumlineY", function(y:Float)
+		{
+			PlayState.instance.strumLine.y = y;
+		});
+
 		Lua_helper.add_callback(lua, "setHealthBarColors", function(leftHex:String, rightHex:String) {
 			var left:FlxColor = Std.parseInt(leftHex);
 			if(!leftHex.startsWith('0x')) left = Std.parseInt('0xff' + leftHex);
@@ -3217,6 +3239,20 @@ class FunkinLua {
 			case 'camother' | 'other': return PlayState.instance.camOther;
 		}
 		return PlayState.instance.camGame;
+	}
+	
+	function doFunction(id:String, ?val1:Dynamic, ?val2:Dynamic, ?val3:Dynamic, ?val4:Dynamic)
+	{
+		//this is dumb but idk how else to do it and i don't wanna make multiple functions for different playstate functions so yeah.
+		switch (id)
+		{
+			case 'startCountdown': PlayState.instance.startCountdown();
+			case 'resyncVocals': PlayState.instance.resyncVocals();
+			case 'doTimeTravel': PlayState.instance.doTimeTravel(val1, val2);
+			case 'uncacheImage': Paths.clearStoredMemory2(val1, 'image');
+			case 'uncacheSound': Paths.clearStoredMemory2(val1, 'sound');
+			case 'spawnStartingNoteSplash': PlayState.instance.spawnNoteSplash(0, 0, 0);
+		}
 	}
 
 	public function luaTrace(text:String, ignoreCheck:Bool = false, deprecated:Bool = false, color:FlxColor = FlxColor.WHITE) {

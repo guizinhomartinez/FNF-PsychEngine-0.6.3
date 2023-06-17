@@ -172,7 +172,6 @@ class CharacterEditorState extends MusicBeatState
 		FlxG.camera.follow(camFollow);
 
 		var tabs = [
-			//{name: 'Offsets', label: 'Offsets'},
 			{name: 'Settings', label: 'Settings'},
 		];
 
@@ -199,7 +198,6 @@ class CharacterEditorState extends MusicBeatState
 		add(UI_box);
 		add(changeBGbutton);
 
-		//addOffsetsUI();
 		addSettingsUI();
 
 		addCharacterUI();
@@ -456,6 +454,7 @@ class CharacterEditorState extends MusicBeatState
 	var flipXCheckBox:FlxUICheckBox;
 	var flipYCheckBox:FlxUICheckBox;
 	var noAntialiasingCheckBox:FlxUICheckBox;
+	var psychPlayerCheckBox:FlxUICheckBox;
 
 	var healthColorStepperR:FlxUINumericStepper;
 	var healthColorStepperG:FlxUINumericStepper;
@@ -524,6 +523,12 @@ class CharacterEditorState extends MusicBeatState
 			ghostChar.antialiasing = char.antialiasing;
 		};
 
+		psychPlayerCheckBox = new FlxUICheckBox(flipXCheckBox.x, noAntialiasingCheckBox.y + 40, null, null, "Player Character", 80);
+		psychPlayerCheckBox.checked = char.isPsychPlayer;
+		psychPlayerCheckBox.callback = function() {
+			char.isPsychPlayer = psychPlayerCheckBox.checked;
+		};
+
 		positionXStepper = new FlxUINumericStepper(flipXCheckBox.x + 110, flipXCheckBox.y, 10, char.positionArray[0], -9000, 9000, 0);
 		positionYStepper = new FlxUINumericStepper(positionXStepper.x + 60, positionXStepper.y, 10, char.positionArray[1], -9000, 9000, 0);
 
@@ -554,6 +559,7 @@ class CharacterEditorState extends MusicBeatState
 		tab_group.add(flipXCheckBox);
 		tab_group.add(flipYCheckBox);
 		tab_group.add(noAntialiasingCheckBox);
+		tab_group.add(psychPlayerCheckBox);
 		tab_group.add(positionXStepper);
 		tab_group.add(positionYStepper);
 		tab_group.add(positionCameraXStepper);
@@ -632,6 +638,7 @@ class CharacterEditorState extends MusicBeatState
 					char.animationsArray.remove(anim);
 				}
 			}
+
 
 			var newAnim:AnimArray = {
 				anim: animationInputText.text,
@@ -845,6 +852,14 @@ class CharacterEditorState extends MusicBeatState
 		}
 		dumbTexts.clear();
 
+		var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, 'Opponent Offsets:', 15);
+		text.setFormat(null, 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		text.scrollFactor.set();
+		text.borderSize = 1;
+		dumbTexts.add(text);
+		text.cameras = [camHUD];
+		daLoop++;
+
 		for (anim => offsets in char.animOffsets)
 		{
 			var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, anim + ": " + offsets, 15);
@@ -893,15 +908,6 @@ class CharacterEditorState extends MusicBeatState
 		charLayer.add(char);
 
 		char.setPosition(char.positionArray[0] + OFFSET_X + 100, char.positionArray[1]);
-
-		/* THIS FUNCTION WAS USED TO PUT THE .TXT OFFSETS INTO THE .JSON
-
-		for (anim => offset in char.animOffsets) {
-			var leAnim:AnimArray = findAnimationByName(anim);
-			if(leAnim != null) {
-				leAnim.offsets = [offset[0], offset[1]];
-			}
-		}*/
 
 		if(blahBlahBlah) {
 			genBoyOffsets();
@@ -1147,8 +1153,6 @@ class CharacterEditorState extends MusicBeatState
 
 				var controlArray:Array<Bool> = [FlxG.keys.justPressed.LEFT, FlxG.keys.justPressed.RIGHT, FlxG.keys.justPressed.UP, FlxG.keys.justPressed.DOWN];
 
-
-
 				for (i in 0...controlArray.length) {
 					if(controlArray[i]) {
 						var holdShift = FlxG.keys.pressed.SHIFT;
@@ -1181,22 +1185,6 @@ class CharacterEditorState extends MusicBeatState
 	}
 
 	var _file:FileReference;
-	/*private function saveOffsets()
-	{
-		var data:String = '';
-		for (anim => offsets in char.animOffsets) {
-			data += anim + ' ' + offsets[0] + ' ' + offsets[1] + '\n';
-		}
-
-		if (data.length > 0)
-		{
-			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
-			_file.addEventListener(Event.CANCEL, onSaveCancel);
-			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data, daAnim + "Offsets.txt");
-		}
-	}*/
 
 	function onSaveComplete(_):Void
 	{
@@ -1238,6 +1226,7 @@ class CharacterEditorState extends MusicBeatState
 			"sing_duration": char.singDuration,
 			"healthicon": char.healthIcon,
 			"noteskin": char.noteSkin,
+			"isPlayerChar": char.isPsychPlayer,
 
 			"position":	char.positionArray,
 			"camera_position": char.cameraPosition,
