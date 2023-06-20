@@ -356,6 +356,7 @@ class CharacterEditorState extends MusicBeatState
 			],
 			"sing_duration": 6.1,
 			"noteskin": "",
+			"isPlayerChar": false,
 			"scale": 1,
 		}';
 
@@ -523,7 +524,7 @@ class CharacterEditorState extends MusicBeatState
 			ghostChar.antialiasing = char.antialiasing;
 		};
 
-		psychPlayerCheckBox = new FlxUICheckBox(flipXCheckBox.x, noAntialiasingCheckBox.y + 40, null, null, "Player Character", 80);
+		psychPlayerCheckBox = new FlxUICheckBox(flipXCheckBox.x, flipXCheckBox.y - 40, null, null, "Player Character", 80);
 		psychPlayerCheckBox.checked = char.isPsychPlayer;
 		psychPlayerCheckBox.callback = function() {
 			char.isPsychPlayer = psychPlayerCheckBox.checked;

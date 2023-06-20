@@ -6335,13 +6335,16 @@ class PlayState extends MusicBeatState
 			startDelay: Conductor.crochet * 0.001
 		});
 
-		ratingTween = FlxTween.tween(rating.scale, {x: 0}, 0.2, {
-			startDelay: Conductor.crochet * 0.001
-		});
-
-		ratingTween = FlxTween.tween(rating.scale, {y: 0}, 0.2, {
-			startDelay: Conductor.crochet * 0.001
-		});
+		if (ClientPrefs.dynamicRatings)
+		{
+			ratingTween = FlxTween.tween(rating.scale, {x: 0}, 0.2, {
+				startDelay: Conductor.crochet * 0.001
+			});
+	
+			ratingTween = FlxTween.tween(rating.scale, {y: 0}, 0.2, {
+				startDelay: Conductor.crochet * 0.001
+			});
+		}
 	}
 
 	public var healthMultiplier:Float = 1;

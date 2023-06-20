@@ -65,7 +65,7 @@ class VisualsUISubState extends BaseOptionsMenu
 		addOption(option);
 
 		var option:Option = new Option('Smooth Health',
-			"If enabled, when hitting a note, the health will smoothly be added\nWARNING! mods that remove health may break!",
+			"If enabled, when hitting a note, the health will smoothly be added\nWARNING! mods that drain the player's health may break!",
 			'smoothHealth',
 			'Bool',
 			false);

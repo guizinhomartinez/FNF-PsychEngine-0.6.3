@@ -240,14 +240,16 @@ class Character extends FlxSprite
 		{
 			flipX = !flipX;
 
-			// if (isPsychPlayer)
-				// flipAnims();
+			if (!isPsychPlayer && (!curCharacter.startsWith('bf') || !curCharacter.endsWith('bf')))
+				flipAnims();
+			else if (!curCharacter.startsWith('bf') || !curCharacter.endsWith('bf'))
+				isPsychPlayer = true;
 		}
 
 		if (!isPlayer)
 		{
-			// if (!isPsychPlayer)
-				// flipAnims();
+			if (isPsychPlayer && (!curCharacter.startsWith('bf') || !curCharacter.endsWith('bf')))
+				flipAnims();
 		}
 
 		switch(curCharacter)
