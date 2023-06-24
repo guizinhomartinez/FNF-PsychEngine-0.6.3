@@ -356,7 +356,6 @@ class CharacterEditorState extends MusicBeatState
 			],
 			"sing_duration": 6.1,
 			"noteskin": "",
-			"isPlayerChar": false,
 			"scale": 1,
 		}';
 
@@ -455,7 +454,6 @@ class CharacterEditorState extends MusicBeatState
 	var flipXCheckBox:FlxUICheckBox;
 	var flipYCheckBox:FlxUICheckBox;
 	var noAntialiasingCheckBox:FlxUICheckBox;
-	var psychPlayerCheckBox:FlxUICheckBox;
 
 	var healthColorStepperR:FlxUINumericStepper;
 	var healthColorStepperG:FlxUINumericStepper;
@@ -524,12 +522,6 @@ class CharacterEditorState extends MusicBeatState
 			ghostChar.antialiasing = char.antialiasing;
 		};
 
-		psychPlayerCheckBox = new FlxUICheckBox(flipXCheckBox.x, flipXCheckBox.y - 40, null, null, "Player Character", 80);
-		psychPlayerCheckBox.checked = char.isPsychPlayer;
-		psychPlayerCheckBox.callback = function() {
-			char.isPsychPlayer = psychPlayerCheckBox.checked;
-		};
-
 		positionXStepper = new FlxUINumericStepper(flipXCheckBox.x + 110, flipXCheckBox.y, 10, char.positionArray[0], -9000, 9000, 0);
 		positionYStepper = new FlxUINumericStepper(positionXStepper.x + 60, positionXStepper.y, 10, char.positionArray[1], -9000, 9000, 0);
 
@@ -560,7 +552,6 @@ class CharacterEditorState extends MusicBeatState
 		tab_group.add(flipXCheckBox);
 		tab_group.add(flipYCheckBox);
 		tab_group.add(noAntialiasingCheckBox);
-		tab_group.add(psychPlayerCheckBox);
 		tab_group.add(positionXStepper);
 		tab_group.add(positionYStepper);
 		tab_group.add(positionCameraXStepper);
@@ -1227,7 +1218,6 @@ class CharacterEditorState extends MusicBeatState
 			"sing_duration": char.singDuration,
 			"healthicon": char.healthIcon,
 			"noteskin": char.noteSkin,
-			"isPlayerChar": char.isPsychPlayer,
 
 			"position":	char.positionArray,
 			"camera_position": char.cameraPosition,

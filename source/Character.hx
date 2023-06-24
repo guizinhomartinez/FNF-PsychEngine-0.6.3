@@ -27,8 +27,6 @@ typedef CharacterFile = {
 	var sing_duration:Float;
 	var healthicon:String;
 	var noteskin:String;
-	var isPlayerChar:Bool;
-	var custom_player_offsets:Bool;
 
 	var position:Array<Float>;
 	var camera_position:Array<Float>;
@@ -74,8 +72,6 @@ class Character extends FlxSprite
 	public var cameraPosition:Array<Float> = [0, 0];
 
 	public var hasMissAnimations:Bool = false;
-
-	public var isPsychPlayer:Bool = false;
 
 	//Used on Character Editor
 	public var imageFile:String = '';
@@ -139,9 +135,6 @@ class Character extends FlxSprite
 				var txtToFind:String = Paths.getPath('images/' + json.image + '.txt', TEXT);
 				noteSkin = json.noteskin;
 				
-				//var modTextureToFind:String = Paths.modFolders("images/"+json.image);
-				//var textureToFind:String = Paths.getPath('images/' + json.image, new AssetType();
-				
 				if (FileSystem.exists(modTxtToFind) || FileSystem.exists(txtToFind) || Assets.exists(txtToFind))
 				#else
 				if (Assets.exists(Paths.getPath('images/' + json.image + '.txt', TEXT)))
@@ -153,9 +146,6 @@ class Character extends FlxSprite
 				#if MODS_ALLOWED
 				var modAnimToFind:String = Paths.modFolders('images/' + json.image + '/Animation.json');
 				var animToFind:String = Paths.getPath('images/' + json.image + '/Animation.json', TEXT);
-				
-				//var modTextureToFind:String = Paths.modFolders("images/"+json.image);
-				//var textureToFind:String = Paths.getPath('images/' + json.image, new AssetType();
 				
 				if (FileSystem.exists(modAnimToFind) || FileSystem.exists(animToFind) || Assets.exists(animToFind))
 				#else
@@ -191,10 +181,6 @@ class Character extends FlxSprite
 				singDuration = json.sing_duration;
 				flipX = !!json.flip_x;
 
-				if (json.isPlayerChar){
-					isPsychPlayer = json.isPlayerChar;
-				}
-
 				if(json.no_antialiasing) {
 					antialiasing = false;
 					noAntialiasing = true;
@@ -227,7 +213,6 @@ class Character extends FlxSprite
 				} else {
 					quickAnimAdd('idle', 'BF idle dance');
 				}
-				//trace('Loaded file to character ' + curCharacter);
 		}
 		originalFlipX = flipX;
 		originalFlipY = flipY;
@@ -239,17 +224,6 @@ class Character extends FlxSprite
 		if (isPlayer)
 		{
 			flipX = !flipX;
-
-			if (!isPsychPlayer && (!curCharacter.startsWith('bf') || !curCharacter.endsWith('bf')))
-				flipAnims();
-			else if (!curCharacter.startsWith('bf') || !curCharacter.endsWith('bf'))
-				isPsychPlayer = true;
-		}
-
-		if (!isPlayer)
-		{
-			if (isPsychPlayer && (!curCharacter.startsWith('bf') || !curCharacter.endsWith('bf')))
-				flipAnims();
 		}
 
 		switch(curCharacter)

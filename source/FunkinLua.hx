@@ -1568,6 +1568,22 @@ class FunkinLua {
 		Lua_helper.add_callback(lua, "setRatingFC", function(value:String) {
 			PlayState.instance.ratingFC = value;
 		});
+		Lua_helper.add_callback(lua,"getActorXMidpoint", function (id:String, ?graphic:Bool = false) {
+			var shit:Dynamic = getObjectDirectly(id);
+
+			if (graphic)
+				return shit.getGraphicMidpoint().x;
+
+			return shit.getMidpoint().x;
+		});
+		Lua_helper.add_callback(lua,"getActorYMidpoint", function (id:String, ?graphic:Bool = false) {
+			var shit:Dynamic = getObjectDirectly(id);
+
+			if (graphic)
+				return shit.getGraphicMidpoint().y;
+
+			return shit.getMidpoint().y;
+		});
 		Lua_helper.add_callback(lua, "getMouseX", function(camera:String) {
 			var cam:FlxCamera = cameraFromString(camera);
 			return FlxG.mouse.getScreenPosition(cam).x;
