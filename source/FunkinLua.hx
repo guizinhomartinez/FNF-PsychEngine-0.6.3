@@ -2047,6 +2047,23 @@ class FunkinLua {
 			PlayState.instance.strumLine.y = y;
 		});
 
+		Lua_helper.add_callback(lua, "flipCharacterAnims", function(character:String = 'dad', playerAnimOffsets:Bool = false)
+		{
+			switch(character.toLowerCase())
+			{
+				case 'bf' | 'boyfriend': 
+					PlayState.instance.boyfriend.flipAnims();
+				case 'gf' | 'girlfriend': 
+					if(PlayState.instance.gf != null) 
+						PlayState.instance.gf.flipAnims();
+				case 'dad&bf' | 'both': 
+					PlayState.instance.boyfriend.flipAnims(); 
+					PlayState.instance.dad.flipAnims();
+				default: 
+					PlayState.instance.dad.flipAnims();
+			}
+		});
+
 		Lua_helper.add_callback(lua, "setHealthBarColors", function(leftHex:String, rightHex:String) {
 			var left:FlxColor = Std.parseInt(leftHex);
 			if(!leftHex.startsWith('0x')) left = Std.parseInt('0xff' + leftHex);

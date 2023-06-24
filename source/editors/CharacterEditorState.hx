@@ -404,6 +404,10 @@ class CharacterEditorState extends MusicBeatState
 				{
 					character.addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
 				}
+				for (anim in character.animationsArray)
+				{
+					character.addPlayerOffset(anim.anim, anim.playerOffsets[0], anim.playerOffsets[1]);
+				}
 				if(character.animationsArray[0] != null) {
 					character.playAnim(character.animationsArray[0].anim, true);
 				}
@@ -621,9 +625,11 @@ class CharacterEditorState extends MusicBeatState
 			}
 
 			var lastOffsets:Array<Int> = [0, 0];
+			var lastPlayerOffsets:Array<Int> = [0, 0];
 			for (anim in char.animationsArray) {
 				if(animationInputText.text == anim.anim) {
 					lastOffsets = anim.offsets;
+					lastPlayerOffsets = anim.playerOffsets;
 					if(char.animation.getByName(animationInputText.text) != null) {
 						char.animation.remove(animationInputText.text);
 					}
@@ -631,14 +637,14 @@ class CharacterEditorState extends MusicBeatState
 				}
 			}
 
-
 			var newAnim:AnimArray = {
 				anim: animationInputText.text,
 				name: animationNameInputText.text,
 				fps: Math.round(animationNameFramerate.value),
 				loop: animationLoopCheckBox.checked,
 				indices: indices,
-				offsets: lastOffsets
+				offsets: lastOffsets,
+				playerOffsets: lastPlayerOffsets
 			};
 			if(indices != null && indices.length > 0) {
 				char.animation.addByIndices(newAnim.anim, newAnim.name, newAnim.indices, "", newAnim.fps, newAnim.loop);
@@ -648,6 +654,9 @@ class CharacterEditorState extends MusicBeatState
 
 			if(!char.animOffsets.exists(newAnim.anim)) {
 				char.addOffset(newAnim.anim, 0, 0);
+			}
+			if(!char.animPlayerOffsets.exists(newAnim.anim)) {
+				char.addPlayerOffset(newAnim.anim, 0, 0);
 			}
 			char.animationsArray.push(newAnim);
 
@@ -984,6 +993,9 @@ class CharacterEditorState extends MusicBeatState
 
 			if(anim.offsets != null && anim.offsets.length > 1) {
 				ghostChar.addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
+			}
+			if(anim.playerOffsets != null && anim.playerOffsets.length > 1) {
+				ghostChar.addPlayerOffset(anim.anim, anim.playerOffsets[0], anim.playerOffsets[1]);
 			}
 		}
 

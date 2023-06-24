@@ -42,12 +42,14 @@ typedef AnimArray = {
 	var loop:Bool;
 	var indices:Array<Int>;
 	var offsets:Array<Int>;
+	var playerOffsets:Array<Int>;
 }
 
 class Character extends FlxSprite
 {
 	public var mostRecentRow:Int = 0;
 	public var animOffsets:Map<String, Array<Dynamic>>;
+	public var animPlayerOffsets:Map<String, Array<Dynamic>>;
 	public var debugMode:Bool = false;
 
 	public var isPlayer:Bool = false;
@@ -88,8 +90,10 @@ class Character extends FlxSprite
 
 		#if (haxe >= "4.0.0")
 		animOffsets = new Map();
+		animPlayerOffsets = new Map();
 		#else
 		animOffsets = new Map<String, Array<Dynamic>>();
+		animPlayerOffsets = new Map<String, Array<Dynamic>>();
 		#end
 		curCharacter = character;
 		this.isPlayer = isPlayer;
@@ -209,6 +213,9 @@ class Character extends FlxSprite
 						if(anim.offsets != null && anim.offsets.length > 1) {
 							addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
 						}
+						if(anim.playerOffsets != null && anim.playerOffsets.length > 1) {
+							addPlayerOffset(anim.anim, anim.playerOffsets[0], anim.playerOffsets[1]);
+						}
 					}
 				} else {
 					quickAnimAdd('idle', 'BF idle dance');
@@ -325,13 +332,27 @@ class Character extends FlxSprite
 		specialAnim = false;
 		animation.play(AnimName, Force, Reversed, Frame);
 
+		var daPlayerOffset = animPlayerOffsets.get(AnimName);
 		var daOffset = animOffsets.get(AnimName);
-		if (animOffsets.exists(AnimName))
+
+		if (isPlayer)
 		{
-			offset.set(daOffset[0], daOffset[1]);
+			if (animPlayerOffsets.exists(AnimName))
+			{
+				offset.set(daPlayerOffset[0], daPlayerOffset[1]);
+			}
+			else
+				offset.set(daOffset[0], daOffset[1]);
 		}
 		else
-			offset.set(0, 0);
+		{
+			if (animOffsets.exists(AnimName))
+				{
+					offset.set(daOffset[0], daOffset[1]);
+				}
+				else
+					offset.set(0, 0);
+		}
 
 		if (curCharacter.startsWith('gf'))
 		{
@@ -394,6 +415,11 @@ class Character extends FlxSprite
 	public function addOffset(name:String, x:Float = 0, y:Float = 0)
 	{
 		animOffsets[name] = [x, y];
+	}
+
+	public function addPlayerOffset(name:String, x:Float = 0, y:Float = 0)
+	{
+		animPlayerOffsets[name] = [x, y];
 	}
 
 	public function quickAnimAdd(name:String, anim:String)
