@@ -287,6 +287,10 @@ class CharacterEditorState extends MusicBeatState
 						0,
 						0
 					],
+					"playerOffsets": [
+						0,
+						0
+					],
 					"fps": 24,
 					"anim": "idle",
 					"indices": [],
@@ -294,6 +298,10 @@ class CharacterEditorState extends MusicBeatState
 				},
 				{
 					"offsets": [
+						0,
+						0
+					],
+					"playerOffsets": [
 						0,
 						0
 					],
@@ -308,6 +316,10 @@ class CharacterEditorState extends MusicBeatState
 						0,
 						0
 					],
+					"playerOffsets": [
+						0,
+						0
+					],
 					"indices": [],
 					"fps": 24,
 					"anim": "singDOWN",
@@ -319,6 +331,10 @@ class CharacterEditorState extends MusicBeatState
 						0,
 						0
 					],
+					"playerOffsets": [
+						0,
+						0
+					],
 					"indices": [],
 					"fps": 24,
 					"anim": "singUP",
@@ -327,6 +343,10 @@ class CharacterEditorState extends MusicBeatState
 				},
 				{
 					"offsets": [
+						0,
+						0
+					],
+					"playerOffsets": [
 						0,
 						0
 					],
@@ -399,6 +419,7 @@ class CharacterEditorState extends MusicBeatState
 			for (character in characters)
 			{
 				character.animOffsets.clear();
+				character.animPlayerOffsets.clear();
 				character.animationsArray = parsedJson.animations;
 				for (anim in character.animationsArray)
 				{
@@ -695,6 +716,9 @@ class CharacterEditorState extends MusicBeatState
 					if(char.animOffsets.exists(anim.anim)) {
 						char.animOffsets.remove(anim.anim);
 					}
+					if(char.animPlayerOffsets.exists(anim.anim)) {
+						char.animPlayerOffsets.remove(anim.anim);
+					}
 					char.animationsArray.remove(anim);
 
 					if(resetAnim && char.animationsArray.length > 0) {
@@ -871,6 +895,31 @@ class CharacterEditorState extends MusicBeatState
 			text.cameras = [camHUD];
 
 			daLoop++;
+		}
+
+		if (char.animPlayerOffsets != null)
+		{
+			daLoop++;
+
+			var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, 'Player Offsets:', 15);
+			text.setFormat(null, 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			text.scrollFactor.set();
+			text.borderSize = 1;
+			dumbTexts.add(text);
+			text.cameras = [camHUD];
+			daLoop++;
+	
+			for (anim => offsets in char.animPlayerOffsets)
+			{
+				var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, anim + ": " + offsets, 15);
+				text.setFormat(null, 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				text.scrollFactor.set();
+				text.borderSize = 1;
+				dumbTexts.add(text);
+				text.cameras = [camHUD];
+	
+				daLoop++;
+			}
 		}
 
 		textAnim.visible = true;
@@ -1148,11 +1197,22 @@ class CharacterEditorState extends MusicBeatState
 				}
 				if (FlxG.keys.justPressed.T)
 				{
-					char.animationsArray[curAnim].offsets = [0, 0];
+					if(char.isPlayer)
+					{
+						char.animationsArray[curAnim].playerOffsets = [0, 0];
 
-					char.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
-					ghostChar.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
-					genBoyOffsets();
+						char.addPlayerOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].playerOffsets[0], char.animationsArray[curAnim].playerOffsets[1]);
+						ghostChar.addPlayerOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].playerOffsets[0], char.animationsArray[curAnim].playerOffsets[1]);
+						genBoyOffsets();
+					}
+					else
+					{
+						char.animationsArray[curAnim].offsets = [0, 0];
+
+						char.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
+						ghostChar.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
+						genBoyOffsets();
+					}
 				}
 
 				var controlArray:Array<Bool> = [FlxG.keys.justPressed.LEFT, FlxG.keys.justPressed.RIGHT, FlxG.keys.justPressed.UP, FlxG.keys.justPressed.DOWN];
@@ -1169,11 +1229,20 @@ class CharacterEditorState extends MusicBeatState
 
 						var negaMult:Int = 1;
 						if(i % 2 == 1) negaMult = -1;
-						char.animationsArray[curAnim].offsets[arrayVal] += negaMult * multiplier;
+						if (char.isPlayer)
+						{
+							char.animationsArray[curAnim].playerOffsets[arrayVal] += negaMult * multiplier;
 
-						char.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
-						ghostChar.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
+							char.addPlayerOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].playerOffsets[0], char.animationsArray[curAnim].playerOffsets[1]);
+							ghostChar.addPlayerOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].playerOffsets[0], char.animationsArray[curAnim].playerOffsets[1]);
+						}
+						else
+						{
+							char.animationsArray[curAnim].offsets[arrayVal] += negaMult * multiplier;
 
+							char.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
+							ghostChar.addOffset(char.animationsArray[curAnim].anim, char.animationsArray[curAnim].offsets[0], char.animationsArray[curAnim].offsets[1]);
+						}
 						char.playAnim(char.animationsArray[curAnim].anim, false);
 						if(ghostChar.animation.curAnim != null && char.animation.curAnim != null && char.animation.curAnim.name == ghostChar.animation.curAnim.name) {
 							ghostChar.playAnim(char.animation.curAnim.name, false);
