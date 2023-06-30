@@ -395,6 +395,8 @@ class PlayState extends MusicBeatState
 	var songNameDisplayTweenOut:FlxTween;
 	var iconShowTweenOut:FlxTween;*/
 
+	var daSection:Int = 0;
+
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
 	public static var seenCutscene:Bool = false;
@@ -3673,8 +3675,16 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		var suf:String = "";
+		var stuff:Array<String> = [];
+
+		if (FileSystem.exists(Paths.txt(SONG.song.toLowerCase()  + "/arrowSwitches" + suf))){
+			stuff = CoolUtil.coolTextFile2(Paths.txt(SONG.song.toLowerCase()  + "/arrowSwitches" + suf));
+		}
+
 		for (section in noteData)
 		{
+
 			for (songNotes in section.sectionNotes)
 			{
 				var daStrumTime:Float = songNotes[0];
@@ -3695,6 +3705,43 @@ class PlayState extends MusicBeatState
 
 				var otherDad:String = changenoteskin(daStrumTime, 1);
 				var otherBoy:String = changenoteskin(daStrumTime, 0);
+	
+				if (SONG.changeArrows)
+				{
+					if (stuff != [])
+					{
+						for (i in 0...stuff.length)
+						{
+							var data:Array<String> = stuff[i].split(' ');
+
+							if (daSection == Std.parseInt(data[0])){
+								(data[2] == 'dad' ? otherDad = data[1] : otherBoy = data[1]);
+							}
+
+							if (data[1] == "normal")
+								data[1] == "NOTE_assets";
+
+							if (data[2] != "dad")
+							{
+								playerStrums.forEach(function(note:StrumNote) 
+								{
+									var sk = boyfriend.noteSkin;
+									if (sk == "") sk = 'NOTE_assets';
+									note.reloadNote(sk);
+								});
+							}
+							if (data[2] == "dad")
+							{
+								opponentStrums.forEach(function(note:StrumNote)
+								{
+									var sk = dad.noteSkin;
+									if (sk == "") sk = 'NOTE_assets';
+									note.reloadNote(sk);
+								});
+							}
+						}
+					}
+				}
 
 				var swagNote:Note;
 				if (SONG.changeArrows)
@@ -3712,6 +3759,7 @@ class PlayState extends MusicBeatState
 				swagNote.gfNote = (section.gfSection && (songNotes[1]<4));
 				swagNote.boyfriend2play = (section.bf2Section && (songNotes[1]<4));
 				swagNote.noteType = songNotes[3];
+				swagNote.noteSection = daSection;
 				if(!Std.isOfType(songNotes[3], String)) swagNote.noteType = editors.ChartingState.noteTypeList[songNotes[3]]; //Backward compatibility + compatibility with Week 7 charts
 
 				swagNote.scrollFactor.set();
@@ -3736,6 +3784,7 @@ class PlayState extends MusicBeatState
 						sustainNote.gfNote = (section.gfSection && (songNotes[1]<4));
 						sustainNote.boyfriend2play = (section.bf2Section && (songNotes[1]<4));
 						sustainNote.noteType = swagNote.noteType;
+						sustainNote.noteSection = daSection;
 						sustainNote.scrollFactor.set();
 						swagNote.tail.push(sustainNote);
 						sustainNote.parent = swagNote;
@@ -3773,6 +3822,7 @@ class PlayState extends MusicBeatState
 					noteTypeMap.set(swagNote.noteType, true);
 				}
 			}
+			daSection += 1;
 			daBeats += 1;
 		}
 		for (event in songData.events) //Event Notes
@@ -6006,7 +6056,8 @@ class PlayState extends MusicBeatState
 
 	function doGhostAnim(char:String, animToPlay:String)
 	{
-		if (doItBro == true) return;
+		if (doItBro == true || !ClientPrefs.ghostAnims) 
+			return;
 		var ghost:FlxSprite = dadGhost;
 		var player:Character = dad;
 
@@ -6380,37 +6431,42 @@ class PlayState extends MusicBeatState
 		noteCombo.cameras = [camHUD];
 		insert(members.indexOf(notes), noteCombo);
 
-		if (lastMustHit != SONG.notes[curSection].mustHitSection)
-		{
-			lastMustHit = SONG.notes[curSection].mustHitSection;
-			if (!lastMustHit && notesHit >= 34 && (curBeat % 4 == 0 || curBeat % 4 == 1))
+		try {
+			if (lastMustHit != SONG.notes[curSection].mustHitSection)
 			{
-				addTextToDebug("combo: x" + notesHit, FlxColor.WHITE);
-				noteCombo.visible = true;
-				noteCombo.active = true;
+				lastMustHit = SONG.notes[curSection].mustHitSection;
+				if (!lastMustHit && notesHit >= 34 && (curBeat % 4 == 0 || curBeat % 4 == 1))
+				{
+					// addTextToDebug("combo: x" + notesHit, FlxColor.WHITE);
+					noteCombo.visible = true;
+					noteCombo.active = true;
 
-				noteCombo.animation.play("appear", true);
+					noteCombo.animation.play("appear", true);
 
-				FlxG.sound.play(Paths.sound("NoteComboExecute"));
-	
-				trace("diamond chestplate");
-	
-				notesHit = 0;
+					FlxG.sound.play(Paths.sound("NoteComboExecute"));
+
+					trace("diamond chestplate");
+
+					notesHit = 0;
+				}
 			}
+
+			noteCombo.animation.finishCallback = function(name:String)
+			{
+				if (name == "appear")
+				{
+					noteCombo.animation.play("disappear");
+				}
+				if (name == "disappear")
+				{
+					noteCombo.visible = false;
+					noteCombo.active = false;
+				}
+			};
 		}
-
-		noteCombo.animation.finishCallback = function(name:String)
-		{
-			if (name == "appear")
-			{
-				noteCombo.animation.play("disappear");
-			}
-			if (name == "disappear")
-			{
-				noteCombo.visible = false;
-				noteCombo.active = false;
-			}
-		};
+		catch (e:Dynamic) {
+			trace(e);
+		}
 	}
 
 	public function healthTween(amt:Float) /// from Indie Cross lol

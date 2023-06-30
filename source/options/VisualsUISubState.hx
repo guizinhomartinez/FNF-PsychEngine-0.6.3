@@ -85,6 +85,13 @@ class VisualsUISubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
+		var option:Option = new Option('Ghost Animations',
+			"if Enabled, when hitting 2 or more notes that are in the same column, the player will have a ghost appear behind him",
+			'ghostAnims',
+			'Bool',
+			true);
+		addOption(option);
+
 		/*var option:Option = new Option('no Flickering animation',
 			"If enabled, will disable the flickering caused by long notes",
 			'noLongNoteFlickering',

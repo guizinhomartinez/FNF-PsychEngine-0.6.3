@@ -38,6 +38,7 @@ class ClientPrefs {
 	public static var noLongNoteFlickering:Bool = false;
 	public static var judgementCounter:Bool = true;
 	public static var dynamicRatings:Bool = true;
+	public static var ghostAnims:Bool = true;
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
 		'scrolltype' => 'multiplicative', 
@@ -113,6 +114,7 @@ class ClientPrefs {
 		FlxG.save.data.noLongNoteFlickering = noLongNoteFlickering;
 		FlxG.save.data.judgementCounter = judgementCounter;
 		FlxG.save.data.dynamicRatings = dynamicRatings;
+		FlxG.save.data.ghostAnims = ghostAnims;
 		//FlxG.save.data.cursing = cursing;
 		//FlxG.save.data.violence = violence;
 		FlxG.save.data.camZooms = camZooms;
@@ -186,6 +188,9 @@ class ClientPrefs {
 		}
 		if(FlxG.save.data.dynamicRatings != null) {
 			dynamicRatings = FlxG.save.data.dynamicRatings;
+		}
+		if(FlxG.save.data.ghostAnims != null) {
+			ghostAnims = FlxG.save.data.ghostAnims;
 		}
 		if(FlxG.save.data.lowQuality != null) {
 			lowQuality = FlxG.save.data.lowQuality;

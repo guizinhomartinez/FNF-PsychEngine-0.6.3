@@ -65,6 +65,8 @@ class Note extends FlxSprite
 
 	public var noteSkin:String = "";
 
+	public var noteSection:Int = 0;
+
 	public static var swagWidth:Float = 160 * 0.7;
 	
 	private var colArray:Array<String> = ['purple', 'blue', 'green', 'red'];
@@ -265,7 +267,7 @@ class Note extends FlxSprite
 
 			offsetX -= width / 2;
 
-			if (PlayState.isPixelStage)
+			if (PlayState.isPixelStage || texture == "pixel")
 				offsetX += 30;
 
 			if (prevNote.isSustainNote)
@@ -278,14 +280,14 @@ class Note extends FlxSprite
 					prevNote.scale.y *= PlayState.instance.songSpeed;
 				}
 
-				if(PlayState.isPixelStage) {
+				if(PlayState.isPixelStage || texture == "pixel") {
 					prevNote.scale.y *= 1.19;
 					prevNote.scale.y *= (6 / height);
 				}
 				prevNote.updateHitbox();
 			}
 
-			if(PlayState.isPixelStage) {
+			if(PlayState.isPixelStage || texture == "pixel") {
 				scale.y *= PlayState.daPixelZoom;
 				updateHitbox();
 			}
@@ -330,18 +332,30 @@ class Note extends FlxSprite
 
 		var lastScaleY:Float = scale.y;
 		var blahblah:String = arraySkin.join('/');
-		if(PlayState.isPixelStage) {
+		if(PlayState.isPixelStage || texture == "pixel") {
 			if(isSustainNote) {
-				loadGraphic(Paths.image('pixelUI/' + blahblah + 'ENDS'));
+				if (PlayState.SONG.changeArrows)
+					loadGraphic(Paths.image(blahblah + 'ENDS'));
+				else
+					loadGraphic(Paths.image('pixelUI/' + blahblah + 'ENDS'));
 				width = width / 4;
 				height = height / 2;
 				originalHeightForCalcs = height;
-				loadGraphic(Paths.image('pixelUI/' + blahblah + 'ENDS'), true, Math.floor(width), Math.floor(height));
+				if (PlayState.SONG.changeArrows)
+					loadGraphic(Paths.image(blahblah + 'ENDS'), true, Math.floor(width), Math.floor(height));
+				else
+					loadGraphic(Paths.image('pixelUI/' + blahblah + 'ENDS'), true, Math.floor(width), Math.floor(height));
 			} else {
-				loadGraphic(Paths.image('pixelUI/' + blahblah));
+				if (PlayState.SONG.changeArrows)
+					loadGraphic(Paths.image(blahblah));
+				else
+					loadGraphic(Paths.image('pixelUI/' + blahblah));
 				width = width / 4;
 				height = height / 5;
-				loadGraphic(Paths.image('pixelUI/' + blahblah), true, Math.floor(width), Math.floor(height));
+				if (PlayState.SONG.changeArrows)
+					loadGraphic(Paths.image(blahblah), true, Math.floor(width), Math.floor(height));
+				else
+					loadGraphic(Paths.image('pixelUI/' + blahblah), true, Math.floor(width), Math.floor(height));
 			}
 			setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 			loadPixelNoteAnims();
