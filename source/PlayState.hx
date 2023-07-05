@@ -2083,12 +2083,14 @@ class PlayState extends MusicBeatState
 		switch (style)
 		{
 			case "New HUD":
-				FunkinLua.instance.addLuaScript('coolHud/game hud');
 				remove(timeTxt);
 				remove(timeBarBG);
 				remove(timeBar);
 				remove(scoreTxt);
 				remove(judgementCounter);
+
+				FunkinLua.instance.addLuaScript('coolHud/game hud');
+
 				timeBarBG = new AttachedSprite('timeBar');
 				timeBarBG.setGraphicSize(FlxG.width + 23, 15);
 				timeBarBG.y = (ClientPrefs.downScroll ? 8 : 700);
