@@ -2087,6 +2087,8 @@ class PlayState extends MusicBeatState
 				remove(timeTxt);
 				remove(timeBarBG);
 				remove(timeBar);
+				remove(scoreTxt);
+				remove(judgementCounter);
 				timeBarBG = new AttachedSprite('timeBar');
 				timeBarBG.setGraphicSize(FlxG.width + 23, 15);
 				timeBarBG.y = (ClientPrefs.downScroll ? 8 : 700);
@@ -2097,14 +2099,6 @@ class PlayState extends MusicBeatState
 				timeBarBG.visible = false;
 				scoreGroupSpr.add(timeBarBG);
 				timeBarBG.color = FlxColor.BLACK;
-
-				timeTxt = new FlxText(0, (ClientPrefs.downScroll ? timeBarBG.y + 36 : timeBarBG.y - 36), 400, "", 20);
-				timeTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-				timeTxt.alpha = 0;
-				timeTxt.borderSize = 2;
-				timeTxt.screenCenter(X);
-				timeTxt.antialiasing = ClientPrefs.globalAntialiasing;
-				updateTime = true;
 
 				timeBar = new FlxBar(timeBarBG.x + 12, timeBarBG.y + 8, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 24), 13, this, 'songPercent', 0, 1);
 				timeBar.scrollFactor.set();
