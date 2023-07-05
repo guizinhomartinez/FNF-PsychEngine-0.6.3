@@ -584,6 +584,10 @@ class PlayState extends MusicBeatState
 
 	var usedTimeTravel:Bool = false;
 
+	public var songTxt:FlxText;
+	public var elapsedTxt:FlxText;
+	public var totalTxt:FlxText;
+
 	override public function create()
 	{
 		lastMustHit = SONG.notes[curSection].mustHitSection;
@@ -1560,12 +1564,11 @@ class PlayState extends MusicBeatState
 		timeBarBG.x = timeTxt.x;
 		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
 		timeBarBG.scrollFactor.set();
-		timeBarBG.visible = showTime;
+		timeBarBG.visible = false;
 		timeBarBG.color = FlxColor.BLACK;
 		timeBarBG.xAdd = -4;
 		timeBarBG.yAdd = -4;
 		timeBarBG.screenCenter(X);
-		add(timeBarBG);
 
 		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
 			'songPercent', 0, 1);
@@ -1886,6 +1889,9 @@ class PlayState extends MusicBeatState
 		iconP3.cameras = [camHUD];
 		// iconShow.cameras = [camOther];
 		scoreTxt.cameras = [camHUD];
+		totalTxt.cameras = [camHUD];
+		elapsedTxt.cameras = [camHUD];
+		songTxt.cameras = [camHUD];
 		cutsceneTxt.cameras = [camOther];
 		botplayTxt.cameras = [camHUD];
 		timeBar.cameras = [camHUD];
@@ -2083,13 +2089,11 @@ class PlayState extends MusicBeatState
 		switch (style)
 		{
 			case "New HUD":
-				remove(timeTxt);
+				timeTxt.y = 100000000000;
 				remove(timeBarBG);
 				remove(timeBar);
 				remove(scoreTxt);
 				remove(judgementCounter);
-
-				FunkinLua.instance.addLuaScript('coolHud/game hud');
 
 				timeBarBG = new AttachedSprite('timeBar');
 				timeBarBG.setGraphicSize(FlxG.width + 23, 15);
@@ -2097,7 +2101,6 @@ class PlayState extends MusicBeatState
 				timeBarBG.scrollFactor.set();
 				timeBarBG.updateHitbox();
 				timeBarBG.screenCenter(X);
-				timeBarBG.alpha = 0;
 				timeBarBG.visible = false;
 				scoreGroupSpr.add(timeBarBG);
 				timeBarBG.color = FlxColor.BLACK;
@@ -2106,10 +2109,85 @@ class PlayState extends MusicBeatState
 				timeBar.scrollFactor.set();
 				timeBar.numDivisions = 800; // How much lag this causes?? Should i tone it down to idk, 400 or 200?
 				timeBar.alpha = 0;
+				timeBar.visible = showTime;
 				timeBar.screenCenter(X);
 				scoreGroupSpr.add(timeBar);
 				scoreGroup.add(timeTxt);
 				reloadTimeBarColors();
+
+				songTxt = new FlxText(0, 0, FlxG.width, SONG.song.replace('-', ' '), 20);
+				songTxt.setFormat(Paths.font("PhantomMuff.ttf"), 21, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				songTxt.scrollFactor.set();
+				songTxt.antialiasing = ClientPrefs.globalAntialiasing;
+				songTxt.borderSize = 1.25;
+				songTxt.visible = (!ClientPrefs.hideHud && showTime);
+				songTxt.alpha = 0;
+				insert(members.indexOf(notes) + 1, songTxt);
+
+				elapsedTxt = new FlxText(30, 0, FlxG.width, "", 20);
+				elapsedTxt.setFormat(Paths.font("PhantomMuff.ttf"), 21, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				elapsedTxt.scrollFactor.set();
+				elapsedTxt.antialiasing = ClientPrefs.globalAntialiasing;
+				elapsedTxt.borderSize = 1.25;
+				elapsedTxt.visible = (!ClientPrefs.hideHud && showTime);
+				elapsedTxt.alpha = 0;
+				insert(members.indexOf(notes) + 1, elapsedTxt);
+
+				totalTxt = new FlxText(1100, 0, FlxG.width, "", 20);
+				totalTxt.setFormat(Paths.font("PhantomMuff.ttf"), 21, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				totalTxt.scrollFactor.set();
+				totalTxt.antialiasing = ClientPrefs.globalAntialiasing;
+				totalTxt.borderSize = 1.25;
+				totalTxt.visible = (!ClientPrefs.hideHud && showTime);
+				totalTxt.alpha = 0;
+				insert(members.indexOf(notes) + 1, totalTxt);
+
+				scoreTxt = new FlxText(30, 0, FlxG.width, "", 20);
+				scoreTxt.setFormat(Paths.font("PhantomMuff.ttf"), 21, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				scoreTxt.scrollFactor.set();
+				scoreTxt.antialiasing = ClientPrefs.globalAntialiasing;
+				scoreTxt.borderSize = 1.25;
+				scoreTxt.visible = !ClientPrefs.hideHud;
+				scoreTxt.alpha = 0;
+				insert(members.indexOf(notes) + 1, scoreTxt);
+
+				judgementCounter = new FlxText(1100, 0, 0, "", 20);
+				judgementCounter.setFormat(Paths.font("PhantomMuff.ttf"), 21, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				judgementCounter.borderSize = 1.25;
+				judgementCounter.scrollFactor.set();
+				judgementCounter.cameras = [camHUD];
+				judgementCounter.antialiasing = ClientPrefs.globalAntialiasing;
+				judgementCounter.alpha = 0;
+				if (ClientPrefs.judgementCounter) insert(members.indexOf(notes) + 1, judgementCounter);
+
+				var plusNum:Int = -20;
+
+				var songY:Float;
+				var scoreY:Float;
+
+				if (ClientPrefs.downScroll)
+				{
+					songY = healthBarBG.y - 75;
+					scoreY = songY + 58 + plusNum;
+
+					songTxt.y = songY;
+					elapsedTxt.y = songY;
+					totalTxt.y = songY;
+					timeBar.y = songY - 10;
+					scoreTxt.y = scoreY + 20;
+					judgementCounter.y = scoreY;
+				}
+				else
+				{
+					songY = healthBarBG.y + 40;
+					scoreY = songY - 98 + plusNum;
+
+					songTxt.y = songY;
+					elapsedTxt.y = songY;
+					totalTxt.y = songY;
+					scoreTxt.y = scoreY - 20;
+					judgementCounter.y = scoreY;
+				}
 			case "Vs Impostor HUD":
 				remove(scoreTxt);
 				scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 20);
@@ -3299,7 +3377,24 @@ class PlayState extends MusicBeatState
 
 		switch (ClientPrefs.gameHuds)
 		{
-			case "Vs Impostor HUD":
+			case "New HUD":
+				if (ratingName == "?")
+				{
+					scoreTxt.text = "Score: " + songScore + '\n' +
+					"Misses: " + songMisses + '\n' + 
+					"Accuracy: " + convertedAccDisplay + "%" + '\n' +
+					"Rating: " + "?" + '\n' +
+					"Rank: " + ratingName + '\n';
+				}
+				else
+				{
+					scoreTxt.text = "Score: " + songScore + '\n' +
+					"Misses: " + songMisses + '\n' + 
+					"Accuracy: " + convertedAccDisplay + "%" + '\n' +
+					"Rating: " + ratingFC + '\n' +
+					"Rank: " + ratingName + '\n';
+				}
+ 			case "Vs Impostor HUD":
 				if (ratingName == '?')
 				{
 					scoreTxt.text = 'Score: ' + songScore
@@ -3489,20 +3584,23 @@ class PlayState extends MusicBeatState
 			doAllTheSongIntroStuff();
 		}
 
-		/*if(!paused) {
-			if (task != null)
+		if (ClientPrefs.gameHuds == "New HUD")
+		{
+			if (!ClientPrefs.hideHud)
 			{
-				task.start();
+				PlayState.instance.modchartTweens.set("ScoreInOne", FlxTween.tween(scoreTxt, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
+				PlayState.instance.modchartTweens.set("ScoreInTwo", FlxTween.tween(elapsedTxt, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
+				PlayState.instance.modchartTweens.set("ScoreInThree", FlxTween.tween(totalTxt, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
+				PlayState.instance.modchartTweens.set("ScoreInFour", FlxTween.tween(songTxt, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
+				PlayState.instance.modchartTweens.set("ScoreInFive", FlxTween.tween(judgementCounter, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
 			}
-			if (task2 != null)
+			else
 			{
-				task2.start();
+				PlayState.instance.modchartTweens.set("ScoreInTwo", FlxTween.tween(elapsedTxt, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
+				PlayState.instance.modchartTweens.set("ScoreInThree", FlxTween.tween(totalTxt, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
+				PlayState.instance.modchartTweens.set("ScoreInFour", FlxTween.tween(songTxt, {alpha: 1}, 0.2, {ease: FlxEase.linear}));
 			}
-			if (task3 != null)
-			{
-				task3.start();
-			}
-		}*/
+		}
 
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
@@ -3510,7 +3608,7 @@ class PlayState extends MusicBeatState
 		// songNameDisplayTweenIn = FlxTween.tween(songNameDisplay, {x: 0}, 1, {ease: FlxEase.expoIn});
 		// iconShowTweenIn = FlxTween.tween(iconShow, {x: 1090}, 1, {ease: FlxEase.expoIn});
 		FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
-		FlxTween.tween(timeBarBG, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+		if (ClientPrefs.gameHuds != "New HUD") FlxTween.tween(timeBarBG, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 
 		if (script != null)
@@ -4470,23 +4568,23 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		judgementCounter.text =
-		'Total Hits: ' + songHits + " / " + totalNotes
-		+ '\n' +
-		'Combo: ' + combo + ' ['  + maxCombo + ']'
-		+ '\n' +
-		'Sicks: ' + sicks
-		+ '\n' +
-		'Goods: ' + goods
-		+ '\n' +
-		'Bads: ' + bads
-		+ '\n' +
-		'Shits: ' + shits
-		+ '\n' +
-		'Misses: ' + songMisses
-		+ '\n' +
-		'Rating: ' + (ratingName == "?" ? "?" : '$ratingName$judgementRatingFC')
-		+ '\n';
+		switch (ClientPrefs.gameHuds)
+		{
+			case "New HUD":
+				judgementCounter.text = "Sick: " + sicks + '\n' +
+				"Good: " + goods + '\n' +
+				"Bad: " + bads + '\n' +
+				"Shit: " + shits + '\n';
+			default:
+				judgementCounter.text = 'Total Hits: ' + songHits + " / " + totalNotes + '\n' +
+				'Combo: ' + combo + ' ['  + maxCombo + ']' + '\n' +
+				'Sicks: ' + sicks + '\n' +
+				'Goods: ' + goods + '\n' +
+				'Bads: ' + bads + '\n' +
+				'Shits: ' + shits + '\n' +
+				'Misses: ' + songMisses + '\n' +
+				'Rating: ' + (ratingName == "?" ? "?" : '$ratingName$judgementRatingFC') + '\n';
+		}
 
 		if (combo >= maxCombo) {
 			maxCombo = combo;
@@ -4653,6 +4751,9 @@ class PlayState extends MusicBeatState
 
 					if(ClientPrefs.timeBarType != 'Song Name')
 						timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false) + ' - ' + FlxStringUtil.formatTime(endSongPercent, false);
+
+					totalTxt.text = FlxStringUtil.formatTime(endSongPercent, false);
+					elapsedTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
 				}
 			}
 
@@ -5882,6 +5983,7 @@ class PlayState extends MusicBeatState
 		camZooming = false;
 		inCutscene = false;
 		updateTime = false;
+		totalTxt.text = FlxStringUtil.formatTime(Math.floor(songLength / 1000), false);
 
 		deathCounter = 0;
 		seenCutscene = false;
