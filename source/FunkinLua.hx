@@ -168,8 +168,11 @@ class FunkinLua {
 		set('inGameOver', false);
 		set('mustHitSection', false);
 		set('altAnim', false);
+		set('altAnimPlayer', false);
 		set('gfSection', false);
 		set('bf2Section', false);
+		set('dynamicCamera', ClientPrefs.dynamicCamera);
+		set('camOfs', PlayState.instance.ofs);
 
 		// Gameplay settings
 		set('healthGainMult', PlayState.instance.healthGain);
@@ -1430,7 +1433,7 @@ class FunkinLua {
 
 			if (name == 'Camera Follow Pos' && arg1 != null && arg2 != null)
 			{
-				if (PlayState.instance.doNOTfollowChars)
+				if (PlayState.instance.isEventWorking)
 					PlayState.instance.followChars == false;
 			}
 
@@ -2007,7 +2010,7 @@ class FunkinLua {
 		});
 		Lua_helper.add_callback(lua, "donotFollowChars", function(val:Bool) {
 			luaTrace("setCamOff is deprecated! Use setProperty('followChars', false) instead", false, true);
-			return PlayState.instance.doNOTfollowChars = val;
+			return PlayState.instance.isEventWorking = val;
 		});
 		Lua_helper.add_callback(lua, "setNoteSplash", function(name:String, alpha:Float = 0.6) {
 			PlayState.SONG.splashSkin = name;

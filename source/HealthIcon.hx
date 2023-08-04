@@ -35,8 +35,12 @@ class HealthIcon extends FlxSprite
 	}
 
 	private var iconOffsets:Array<Float> = [0, 0, 0];
+	public var offsetX = 0;
+	public var offsetY = 0;
 	public function changeIcon(char:String) {
 		if(this.char != char) {
+			offsetX = 0;
+			offsetY = 0;
 			var name:String = 'icons/' + char;
 			if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-' + char; //Older versions of psych engine's support
 			if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-face'; //Prevents crash from missing icon
@@ -56,10 +60,12 @@ class HealthIcon extends FlxSprite
 			}
 			
 			updateHitbox();
-			if (width2 == 450) {
-				animation.add(char, [0, 1, 2], 0, false, isPlayer);
-			} else {
-				animation.add(char, [0, 1], 0, false, isPlayer);
+			switch (width2)
+			{
+				case 450:
+					animation.add(char, [0, 1, 2], 0, false, isPlayer);
+				default:
+					animation.add(char, [0, 1], 0, false, isPlayer);
 			}
 			animation.play(char);
 			this.char = char;
@@ -74,8 +80,8 @@ class HealthIcon extends FlxSprite
 	override function updateHitbox()
 	{
 		super.updateHitbox();
-		offset.x = iconOffsets[0];
-		offset.y = iconOffsets[1];
+		offset.x = iconOffsets[0] - offsetX;
+		offset.y = iconOffsets[1] + offsetY;
 	}
 
 	public function getCharacter():String {

@@ -22,6 +22,8 @@ typedef StageFile = {
 	var girlfriend:Array<Dynamic>;
 	var opponent:Array<Dynamic>;
 	var hide_girlfriend:Bool;
+	var dynamic_camera:Bool;
+	var camera_offsets:Float;
 
 	var camera_boyfriend:Array<Float>;
 	var camera_opponent:Array<Float>;

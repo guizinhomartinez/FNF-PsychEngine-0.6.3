@@ -108,6 +108,7 @@ class ChartingState extends MusicBeatState
 		['Zoom Amount', "Value 1: Changes the \"defaultCamZoom\""],
 		['Set Camera Zoom', "Sets the Camera's Zoom.\nThis is based on standard stage zoom rules\nValue 1: New Zoom Value\n\nValue 2: If left blank,\nthe camera will zoom in/out smoothly.\nOtherwise it will instantly zoom in/out.\nValue 3: If left blank,\nthe default ease type will be \"sineInOut\",\nOtherwise, it will use the ease type applied in value 3"],
 		['Add Cinematic Bars', "Adds Cinematic bars.\nValue 1: the speed that the bars are created\nValue 2: thickness of the bars"],
+		['Flash Camera', "Adds a flash to the hud.\nValue 1: Duration of the effect.\nValue 2: The color of the flash. 0 is black, 1 is white, 2 is red\nand 3 is according to the player's healthbar color.\nValue 3: The hud that the flash will happen\n(camHUD, camOther or camGame)."],
 		//vs impostor events
 		['DefeatDark', "black thingy"],
 		['flash', "weirdly programmed flash event (dont change) \n 0 and 1 are normal flashes but 2 and 3 are \n for fades in identity crisis specifically"],
@@ -685,6 +686,7 @@ class ChartingState extends MusicBeatState
 	var check_changeBPM:FlxUICheckBox;
 	var stepperSectionBPM:FlxUINumericStepper;
 	var check_altAnim:FlxUICheckBox;
+	var check_altAnimPlayer:FlxUICheckBox;
 
 	var sectionToCopy:Int = 0;
 	var notesCopied:Array<Dynamic>;
@@ -710,11 +712,15 @@ class ChartingState extends MusicBeatState
 		check_altAnim = new FlxUICheckBox(check_gfSection.x + 120, check_gfSection.y, null, null, "Alt Animation", 100);
 		check_altAnim.checked = _song.notes[curSec].altAnim;
 
+		check_altAnimPlayer = new FlxUICheckBox(check_altAnim.x + 120, check_altAnim.y, null, null, "Player Alt Animation", 100);
+		check_altAnimPlayer.checked = _song.notes[curSec].altAnimPlayer;
+
 		stepperBeats = new FlxUINumericStepper(10, 100, 1, 4, 1, 6, 2);
 		stepperBeats.value = getSectionBeats();
 		stepperBeats.name = 'section_beats';
 		blockPressWhileTypingOnStepper.push(stepperBeats);
 		check_altAnim.name = 'check_altAnim';
+		check_altAnimPlayer.name = 'check_altAnimPlayer';
 
 		check_changeBPM = new FlxUICheckBox(10, stepperBeats.y + 30, null, null, 'Change BPM', 100);
 		check_changeBPM.checked = _song.notes[curSec].changeBPM;
@@ -939,6 +945,7 @@ class ChartingState extends MusicBeatState
 		tab_group_section.add(check_gfSection);
 		tab_group_section.add(check_bf2Section);
 		tab_group_section.add(check_altAnim);
+		tab_group_section.add(check_altAnimPlayer);
 		tab_group_section.add(check_changeBPM);
 		tab_group_section.add(copyButton);
 		tab_group_section.add(pasteButton);
@@ -1475,6 +1482,8 @@ class ChartingState extends MusicBeatState
 					FlxG.log.add('changed bpm shit');
 				case "Alt Animation":
 					_song.notes[curSec].altAnim = check.checked;
+				case "Player Alt Animation":
+					_song.notes[curSec].altAnimPlayer = check.checked;
 			}
 		}
 		else if (id == FlxUINumericStepper.CHANGE_EVENT && (sender is FlxUINumericStepper))
@@ -2537,6 +2546,7 @@ class ChartingState extends MusicBeatState
 		check_gfSection.checked = sec.gfSection;
 		check_bf2Section.checked = sec.bf2Section;
 		check_altAnim.checked = sec.altAnim;
+		check_altAnimPlayer.checked = sec.altAnimPlayer;
 		check_changeBPM.checked = sec.changeBPM;
 		stepperSectionBPM.value = sec.bpm;
 
@@ -2813,7 +2823,8 @@ class ChartingState extends MusicBeatState
 			bf2Section: false,
 			sectionNotes: [],
 			typeOfSection: 0,
-			altAnim: false
+			altAnim: false,
+			altAnimPlayer: false
 		};
 
 		_song.notes.push(sec);

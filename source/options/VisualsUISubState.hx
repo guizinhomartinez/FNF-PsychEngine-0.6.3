@@ -85,6 +85,13 @@ class VisualsUISubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
+			var option:Option = new Option('Dynamic Camera',
+			"If enabled, when pressing a note, the camera will move accordingly to the note pressed. Will not happen if the note is missed.",
+			'dynamicCamera',
+			'Bool',
+			true);
+		addOption(option);
+
 		var option:Option = new Option('Ghost Animations',
 			"if Enabled, when hitting 2 or more notes that are in the same column, the player will have a ghost appear behind him",
 			'ghostAnims',
