@@ -5769,24 +5769,27 @@ class PlayState extends MusicBeatState
 					customFlash.cameras = [camGame];
 				}
 
-				switch (val2)
+				if (!ClientPrefs.flashing)
 				{
-					case 0:
-						blackFlash.alpha = 1;
-						blackFlash.visible = true;
-						FlxTween.tween(blackFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
-					case 1:
-						whiteFlash.alpha = 1;
-						whiteFlash.visible = true;
-						FlxTween.tween(whiteFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
-					case 2:
-						redFlash.alpha = 1;
-						redFlash.visible = true;
-						FlxTween.tween(redFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
-					case 3:
-						customFlash.alpha = 1;
-						customFlash.visible = true;
-						FlxTween.tween(customFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
+					switch (val2)
+					{
+						case 0:
+							blackFlash.alpha = 1;
+							blackFlash.visible = true;
+							FlxTween.tween(blackFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
+						case 1:
+							whiteFlash.alpha = 1;
+							whiteFlash.visible = true;
+							FlxTween.tween(whiteFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
+						case 2:
+							redFlash.alpha = 1;
+							redFlash.visible = true;
+							FlxTween.tween(redFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
+						case 3:
+							customFlash.alpha = 1;
+							customFlash.visible = true;
+							FlxTween.tween(customFlash, {alpha: 0.0001}, val1, {ease: FlxEase.linear});
+					}
 				}
 			case 'Add Cinematic Bars':
 				var val1 = Std.parseFloat(value1);
