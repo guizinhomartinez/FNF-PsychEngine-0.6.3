@@ -427,7 +427,7 @@ class Paths
 			localTrackedAssets.push(path);
 			return currentTrackedAssets.get(path);
 		}
-		trace('oh fuck. $path is returning null... what do we do now?');
+		trace('Oh no! $path is returning null... what do we do???');
 		return null;
 	}
 

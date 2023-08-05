@@ -89,6 +89,9 @@ class FunkinLua {
 		//trace("LuaJIT version: " + Lua.versionJIT());
 
 		//LuaL.dostring(lua, CLENSE);
+
+		var game:PlayState = PlayState.instance;
+
 		try{
 			var result:Dynamic = LuaL.dofile(lua, script);
 			var resultStr:String = Lua.tostring(lua, result);
@@ -109,7 +112,7 @@ class FunkinLua {
 		scriptName = script;
 		initHaxeModule();
 
-		if (!script.endsWith('coolHud/game hud')) trace('lua file loaded succesfully: ' + script);
+		trace('lua file loaded succesfully: ' + script);
 
 		// Lua shit
 		set('Function_StopLua', Function_StopLua);
@@ -1527,14 +1530,14 @@ class FunkinLua {
 		Lua_helper.add_callback(lua, "setCharacterXY", function(type:String, value:Float, value2:Float) {
 			switch(type.toLowerCase()) {
 				case 'dad' | 'opponent':
-					return PlayState.instance.dadGroup.x = value;
-					return PlayState.instance.dadGroup.y = value2;
+					PlayState.instance.dadGroup.x = value;
+					PlayState.instance.dadGroup.y = value2;
 				case 'gf' | 'girlfriend':
-					return PlayState.instance.gfGroup.x = value;
-					return PlayState.instance.gfGroup.y = value2;
+					PlayState.instance.gfGroup.x = value;
+					PlayState.instance.gfGroup.y = value2;
 				default:
-					return PlayState.instance.boyfriendGroup.x = value;
-					return PlayState.instance.boyfriendGroup.y = value2;
+					PlayState.instance.boyfriendGroup.x = value;
+					PlayState.instance.boyfriendGroup.y = value2;
 			}
 		});
 		Lua_helper.add_callback(lua, "cameraSetTarget", function(target:String) {
@@ -2045,6 +2048,10 @@ class FunkinLua {
 			FlxG.camera.focusOn(camPosition.getPosition());
 		});
 
+		Lua_helper.add_callback(lua,"doScoreZoomOnBeat", function(zoomArg1:Int = 2, zoomArg2:Int = 1, ?scoreZoomOnBeat:Bool = true) {
+			PlayState.instance.doScoreZoomOnBeat(zoomArg1, zoomArg2, scoreZoomOnBeat);
+		});
+
 		Lua_helper.add_callback(lua, "setStrumlineY", function(y:Float)
 		{
 			PlayState.instance.strumLine.y = y;
@@ -2074,8 +2081,11 @@ class FunkinLua {
 			if(!rightHex.startsWith('0x')) right = Std.parseInt('0xff' + rightHex);
 
 			PlayState.instance.doNotChangeBar = true;
-			PlayState.instance.healthBar.createFilledBar(left, right);
+			PlayState.instance.healthBar.setColors(left, right);
 			PlayState.instance.healthBar.updateBar();
+		});
+		Lua_helper.add_callback(lua, "setTimeBarColors", function(left:String, right:String) {
+			PlayState.instance.timeBar.setColors(CoolUtil.colorFromString(left), CoolUtil.colorFromString(right));
 		});
 		Lua_helper.add_callback(lua, "setHighlightedColor", function(leftHex:String) {
 			var left:FlxColor = Std.parseInt(leftHex);
